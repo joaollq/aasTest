@@ -44,6 +44,8 @@ stages:
   condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
   jobs:
     - deployment: Deploy
+      pool:
+        name: "windows-latest"
       environment: Dev
       displayName: "DEV"
       strategy:
