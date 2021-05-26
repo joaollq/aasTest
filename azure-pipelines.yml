@@ -43,25 +43,30 @@ stages:
   displayName: "DEV"
   condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
   jobs:
-    - job: Deploy
+    - deployment: Deploy
       pool:
         vmImage: "windows-latest"
+      environment: Dev
       displayName: "DEV"
-      steps:
-        - task: PowerShell@2
-          displayName: Install tabular editor
-          inputs:
-            targetType: 'inline'
-            script: |
-              $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
-              
-              $DownloadDest = join-path (get-location) "TabularEditor.zip"
-              
-              Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
-              
-              Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
-              Remove-Item $DownloadDest
-        - task: CmdLine@2
-          displayName: Deploy Model
-          inputs:
-            script: 'TabularEditor.exe "TestAAS/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - task: PowerShell@2
+                displayName: Install tabular editor
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
+                    
+                    $DownloadDest = join-path (get-location) "TabularEditor.zip"
+                    
+                    Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
+                    
+                    Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
+                    Remove-Item $DownloadDest
+              - task: CmdLine@2
+                displayName: Deploy Model
+                inputs:
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
