@@ -68,4 +68,4 @@ stages:
               - task: CmdLine@2
                 displayName: Deploy Model
                 inputs:
-                  script: 'TabularEditor.exe "$(System.DefaultWorkingDirectory)/TestAAS/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
