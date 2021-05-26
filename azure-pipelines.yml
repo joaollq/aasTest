@@ -12,8 +12,6 @@ trigger:
  branches:
   include:
     - main
-    - test
-    - acceptance
     - production
 
 # PIPELINE VARIABLES
@@ -69,4 +67,3 @@ stages:
                 displayName: Deploy Model
                 inputs:
                   script: 'TabularEditor.exe "$(System.DefaultWorkingDirectory)/_TabularRepo/TabularModel/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-                            
