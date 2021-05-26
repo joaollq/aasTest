@@ -69,28 +69,4 @@ stages:
                 displayName: Deploy Model
                 inputs:
                   script: 'TabularEditor.exe "$(System.DefaultWorkingDirectory)/_TabularRepo/TabularModel/Model.bim" -D "$(ASConnectionString)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-                              
-# ------- Production --------
-- stage: "Production"
-  displayName: "PRODUCTION"
-  condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
-  jobs:
-# Deployment approval step
-    - job: waitForValidation
-      displayName: Wait for external validation  
-      pool: server    
-      timeoutInMinutes: ${{ variables.timeOutInMinutesVariable }} 
-      steps:   
-      - task: ManualValidation@0
-        inputs:
-# Add here the emails of the users that need to be notified
-          notifyUsers: |          
-            johndoe@shell.com
-          instructions: 'Please validate the build configuration and resume'
-    - job: Deploy
-      dependsOn:
-      - waitForValidation
-      condition: succeeded('waitForValidation')
-      steps:
-        - script: echo Hello, Production!
-          displayName: 'Run a one-line script'
+                            
