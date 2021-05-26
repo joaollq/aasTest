@@ -1,0 +1,7 @@
+C:\Shell\TestAAS\TestAAS\bin\Model.asdatabase
+C:\Shell\TestAAS\TestAAS\bin\Model.deploymenttargets
+C:\Shell\TestAAS\TestAAS\bin\Model.deploymentoptions
+C:\Shell\TestAAS\TestAAS\obj\Development\TestAAS.smproj.CoreCompileInputs.cache
+C:\Shell\TestAAS\TestAAS\obj\Development\Model.asdatabase
+C:\Shell\TestAAS\TestAAS\obj\Development\Model.deploymentoptions
+C:\Shell\TestAAS\TestAAS\obj\Development\Model.deploymenttargets
