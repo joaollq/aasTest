@@ -69,4 +69,4 @@ stages:
               - task: CmdLine@2
                 displayName: Deploy Model
                 inputs:
-                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;User ID=4a23032c-9ed7-417e-be6d-cab9ebb3f172@458f1366-7eb8-42a4-a3b7-8f763033f627;Password=_SpvGo639dM55J-7Y6_ffi4G-tNrlN__UJ;Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;User ID=f5ec4fdb-5d0c-4a16-ba3e-33080f2675e0@458f1366-7eb8-42a4-a3b7-8f763033f627;Password=3O5cCU7l2.V_MeO_8r_vL4~GVi2gGuJiZn;Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
