@@ -33,6 +33,35 @@ variables:
 
 stages:
 # ------------------------------------------------------------------------
+#                             BUILD
+# ------------------------------------------------------------------------
+# Fill this stage with the build pipelines for all the artifacts you need
+- stage: "Build"
+  displayName: "BUILD"
+  jobs:
+    - job: Build
+      displayName: "Build Job"
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - task: PowerShell@2
+        displayName: Install tabular editor
+        inputs:
+          targetType: 'inline'
+          script: |
+            $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
+            
+            $DownloadDest = join-path (get-location) "TabularEditor.zip"
+            
+            Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
+
+            Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
+            Remove-Item $DownloadDest
+      - task: CmdLine@2
+        displayName: Best Practice Analysis
+        inputs:
+          script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+# ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
 # There is one stage per environement. Please remove the ones that do not apply
@@ -54,24 +83,6 @@ stages:
             steps:
               - checkout: self
               - task: PowerShell@2
-                displayName: Install tabular editor
-                inputs:
-                  targetType: 'inline'
-                  script: |
-                    $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
-                    
-                    $DownloadDest = join-path (get-location) "TabularEditor.zip"
-                    
-                    Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
-                    
-                    Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
-                    Remove-Item $DownloadDest
-              - task: CmdLine@2
-                displayName: Best Practice Analysis
-                inputs:
-                  script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
-              
-              - task: PowerShell@2
                 displayName: Get Token
                 inputs:
                   targetType: 'inline'
@@ -86,7 +97,7 @@ stages:
                     $token = $LoginResponse.access_token
                     Write-Host "##vso[task.setvariable variable=access_token]$token"
               - task: CmdLine@2
-                displayName: DeployToProd
+                displayName: Deploy to AAS
                 inputs:
                   script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
 
