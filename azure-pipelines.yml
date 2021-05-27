@@ -42,7 +42,7 @@ stages:
     - job: Build
       displayName: "Build Job"
       pool:
-        vmImage: ubuntu-latest
+        vmImage: "windows-latest"
       steps:
       - task: PowerShell@2
         displayName: Install tabular editor
