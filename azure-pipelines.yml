@@ -111,6 +111,6 @@ stages:
                 displayName: Deploy to AAS
                 inputs:
                   script: 'TabularEditor.exe "../TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-                  workingDirectory: 'drop'
+                  workingDirectory: '../drop'
 
               
