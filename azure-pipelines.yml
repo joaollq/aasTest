@@ -70,8 +70,24 @@ stages:
                 displayName: Best Practice Analysis
                 inputs:
                   script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+              
+              - task: PowerShell@2
+                displayName: Get Token
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $Form = @{
+                        grant_type  = 'client_credentials'
+                        client_id   = 'c4dc80fa-bfdd-4e5c-a2fc-be73fd495bd6'
+                        client_secret      = 'Iv0vnStTtdt.MK6FE.tzJ6IYw2y72z1b3x'
+                        scope     = 'https://westeurope.asazure.windows.net/.default'
+                    }
+                    $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/458f1366-7eb8-42a4-a3b7-8f763033f627/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+                    
+                    
+                    echo '##vso[task.setvariable variable=token]$LoginResponse.access_token'
 
               - task: CmdLine@2
                 displayName: Deploy Model
                 inputs:
-                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$(token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
