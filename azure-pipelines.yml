@@ -61,6 +61,14 @@ stages:
         displayName: Best Practice Analysis
         inputs:
           script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+      
+      - task: PublishBuildArtifacts@1
+        displayName: Publish TabularEditor
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/TabularEditor.exe'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+          StoreAsTar: true
 # ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
