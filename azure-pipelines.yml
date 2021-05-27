@@ -86,7 +86,7 @@ stages:
                     
                     $token = $LoginResponse.access_token
 
-                    echo '##vso[task.setvariable variable=token]$token'
+                    Write-Host '##vso[task.setvariable variable=token]$token'
 
               - task: CmdLine@2
                 displayName: Deploy Model
