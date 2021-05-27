@@ -68,7 +68,7 @@ stages:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/TabularEditor.exe'
           ArtifactName: 'drop'
           publishLocation: 'Container'
-          StoreAsTar: true
+          StoreAsTar: false
 # ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
