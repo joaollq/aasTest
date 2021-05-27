@@ -57,6 +57,9 @@ stages:
 
             Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
             Remove-Item $DownloadDest
+            
+            $tabularExe = join-path (get-location) "TabularEditor.exe"
+             Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
       - task: CmdLine@2
         displayName: Best Practice Analysis
         inputs:
@@ -65,7 +68,7 @@ stages:
       - task: PublishBuildArtifacts@1
         displayName: Publish TabularEditor
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/TabularEditor.exe'
+          PathtoPublish: '$(tabularExe)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
           StoreAsTar: false
