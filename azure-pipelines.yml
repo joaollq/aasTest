@@ -85,4 +85,4 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/458f1366-7eb8-42a4-a3b7-8f763033f627/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     Write-Host $token
-#                    TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=bla;Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                    TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$token;Persist Security Info=True;Impersonation Level=Impersonate" -D "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
