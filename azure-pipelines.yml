@@ -102,7 +102,7 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     
-                    $p = Start-Process -filePath TabularEditora.exe -Wait -NoNewWindow -PassThru -ArgumentList "`"C:\Shell\ShellAASDemo\TestAAS\Model.bim`" -D `"Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$token;Persist Security Info=True;Impersonation Level=Impersonate`" `"adventureworks`" -O -C -P -V -E -W"
+                    $p = Start-Process -filePath TabularEditor.exe -Wait -NoNewWindow -PassThru -ArgumentList "`"C:\Shell\ShellAASDemo\TestAAS\Modela.bim`" -D `"Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$token;Persist Security Info=True;Impersonation Level=Impersonate`" `"adventureworks`" -O -C -P -V -E -W"
                    
                     exit $p.ExitCode
                   workingDirectory: '../drop'
