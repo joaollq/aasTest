@@ -17,12 +17,12 @@ trigger:
 variables:
 # Branch names variables
 # Change these variables to fit your project's needs  
-- name: mainBranchName
-  value: 'refs/heads/main'
-  readonly: true
-- name: productionBranchName
-  value: 'refs/heads/production'
-  readonly: true
+  - name: mainBranchName
+    value: 'refs/heads/main'
+    readonly: true
+  - name: productionBranchName
+    value: 'refs/heads/production'
+    readonly: true
   
 
 
