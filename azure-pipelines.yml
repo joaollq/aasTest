@@ -98,7 +98,7 @@ stages:
                   tenantId: '458f1366-7eb8-42a4-a3b7-8f763033f627'
                   appId: 'b85bd734-4f40-4e55-b538-be22b5a471fe'
                   appKey: '14Ks7K.TNOdjgm~Df_8yU~cP2U_lgHXaO4'
-                  pathToModel: '../TestAAS/Model.bim'
+                  pathToModel: 'TestAAS/Model.bim'
                   connectionType: 'none'
                   ipDetectionMethod: 'autoDetect'
 #              - task: PowerShell@2
