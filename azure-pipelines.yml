@@ -14,12 +14,6 @@ trigger:
     - main
     - production
 
-# PIPELINE VARIABLES
-# Add here any variable that you need to use during the pipeline execution
-variables:
-- name: ASDatabaseName
-  value: bla
-
 # Branch names variables
 # Change these variables to fit your project's needs  
 - name: mainBranchName
