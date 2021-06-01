@@ -101,11 +101,8 @@ stages:
                     }
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
-                    Write-Host "##vso[task.setvariable variable=access_token]$token"
-              - task: CmdLine@2
-                displayName: Deploy to AAS
-                inputs:
-                  script: 'start /wait TabularEditor.exe "../TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                    
+                    Start-Process -filePath .\TabularEditor.exe -Wait -NoNewWindow -PassThru -ArgumentList "`"C:\Shell\ShellAASDemo\TestAAS\Model.bim`" -D `"Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$token;Persist Security Info=True;Impersonation Level=Impersonate`" `"adventureworks`" -O -C -P -R -M -W -E -V"
                   workingDirectory: '../drop'
 - stage: "DevTask"
   displayName: "DEV Task"
