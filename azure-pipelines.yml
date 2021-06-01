@@ -31,42 +31,42 @@ stages:
 #                             BUILD
 # ------------------------------------------------------------------------
 # Fill this stage with the build pipelines for all the artifacts you need
-- stage: "Build"
-  displayName: "BUILD"
-  jobs:
-    - job: Build
-      displayName: "Build Job"
-      pool:
-        vmImage: "windows-latest"
-      steps:
-      - task: PowerShell@2
-        displayName: Install tabular editor
-        inputs:
-          targetType: 'inline'
-          script: |
-            $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
-            
-            $DownloadDest = join-path (get-location) "TabularEditor.zip"
-            
-            Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
+#- stage: "Build"
+#  displayName: "BUILD"
+#  jobs:
+#    - job: Build
+ #     displayName: "Build Job"
+  #   pool:
+   #     vmImage: "windows-latest"
+    #  steps:
+     # - task: PowerShell@2
+      #  displayName: Install tabular editor
+       # inputs:
+        #  targetType: 'inline'
+         # script: |
+          #  $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
+           # 
+            #$DownloadDest = join-path (get-location) "TabularEditor.zip"
+            #
+            #Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
 
-            Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
-            Remove-Item $DownloadDest
-            
-            $tabularExe = join-path (get-location) "TabularEditor.exe"
-             Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
-      - task: CmdLine@2
-        displayName: Best Practice Analysis
-        inputs:
-          script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
-      
-      - task: PublishBuildArtifacts@1
-        displayName: Publish TabularEditor
-        inputs:
-          PathtoPublish: '$(tabularExe)'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
-          StoreAsTar: false
+         #   Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
+         #   Remove-Item $DownloadDest
+         #   
+         #   $tabularExe = join-path (get-location) "TabularEditor.exe"
+         #    Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
+#      - task: CmdLine@2
+ #       displayName: Best Practice Analysis
+  #      inputs:
+   #       script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+    #  
+     # - task: PublishBuildArtifacts@1
+      #  displayName: Publish TabularEditor
+       # inputs:
+        #  PathtoPublish: '$(tabularExe)'
+        #  ArtifactName: 'drop'
+        #  publishLocation: 'Container'
+        #  StoreAsTar: false
 # ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
