@@ -44,7 +44,7 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-             $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
+             $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/latest/download/TabularEditor.Portable.zip" 
             
              $DownloadDest = join-path (get-location) "TabularEditor.zip"
             
