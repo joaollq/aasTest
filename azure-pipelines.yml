@@ -92,7 +92,7 @@ stages:
                 inputs:
                   ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
                   ConnectedServiceNameARM: 'ShellTests'
-                  aasServer: 'joaollqtest'
+                  aasServer: 'asazure://westeurope.asazure.windows.net/joaollqtest'
                   modelName: 'adventureworks'
                   loginType: 'spn'
                   tenantId: '458f1366-7eb8-42a4-a3b7-8f763033f627'
