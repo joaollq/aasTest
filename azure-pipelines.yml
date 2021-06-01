@@ -55,10 +55,7 @@ stages:
             
               $tabularExe = join-path (get-location) "TabularEditor.exe"
               Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
-        - task: CmdLine@2
-          displayName: Best Practice Analysis
-          inputs:
-            script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+       
       
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
@@ -88,6 +85,11 @@ stages:
           deploy:
             steps:
               - checkout: self
+              - task: CmdLine@2
+                inputs:
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+                  workingDirectory: '../drop'
+              
               - task: PowerShell@2
                 displayName: Get Token
                 inputs:
