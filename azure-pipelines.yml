@@ -1,0 +1,93 @@
+# CI/CD startup template v1.0
+# Add this template to your project so that you can easily setup CI/CD on your project.
+#
+# This template contains the following features:
+#   - Automatically triggers a build whenever new code is pushed to main, test, acceptance and production branches
+#   - Automatically starts a release to the correct environement dependent on the branch that triggered the build
+#
+
+# BRANCHES THAT TRIGGER A BUILD
+# Change the branch names (or add or remove branches) so that this fits your project
+trigger:
+ branches:
+  include:
+    - main
+    - production
+
+# PIPELINE VARIABLES
+# Add here any variable that you need to use during the pipeline execution
+variables:
+- name: ASDatabaseName
+  value: bla
+
+# Branch names variables
+# Change these variables to fit your project's needs  
+- name: mainBranchName
+  value: 'refs/heads/main'
+  readonly: true
+- name: productionBranchName
+  value: 'refs/heads/production'
+  readonly: true
+  
+
+
+stages:
+# ------------------------------------------------------------------------
+#                             DEPLOY
+# ------------------------------------------------------------------------
+# There is one stage per environement. Please remove the ones that do not apply
+# to the current project
+
+# ------- DEV -------
+- stage: "Dev"
+  displayName: "DEV"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: "windows-latest"
+      environment: Dev
+      displayName: "DEV"
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - task: PowerShell@2
+                displayName: Install tabular editor
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/download/2.12.4/TabularEditor.Portable.zip" 
+                    
+                    $DownloadDest = join-path (get-location) "TabularEditor.zip"
+                    
+                    Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
+                    
+                    Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
+                    Remove-Item $DownloadDest
+              - task: CmdLine@2
+                displayName: Best Practice Analysis
+                inputs:
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+              
+              - task: PowerShell@2
+                displayName: Get Token
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $Form = @{
+                        grant_type  = 'client_credentials'
+                        client_id   = 'c4dc80fa-bfdd-4e5c-a2fc-be73fd495bd6'
+                        client_secret      = 'Iv0vnStTtdt.MK6FE.tzJ6IYw2y72z1b3x'
+                        scope     = 'https://westeurope.asazure.windows.net/.default'
+                    }
+                    $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/458f1366-7eb8-42a4-a3b7-8f763033f627/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+                    $token = $LoginResponse.access_token
+                    Write-Host "##vso[task.setvariable variable=access_token]$token"
+              - task: CmdLine@2
+                displayName: DeployToProd
+                inputs:
+                  script: 'TabularEditor.exe "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=<Initial Catalog>;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+
+              
