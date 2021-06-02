@@ -116,7 +116,6 @@ stages:
     - job: waitForValidation
       displayName: Wait for external validation  
       pool: server    
-      timeoutInMinutes: ${{ variables.timeOutInMinutesVariable }} 
       steps:   
       - task: ManualValidation@0
         inputs:
