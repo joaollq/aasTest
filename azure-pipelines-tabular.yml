@@ -134,20 +134,19 @@ stages:
           deploy:
             steps:
               - checkout: self
-              - task: PowerShell@2
-                displayName: Step 0 - Get Token for AAS admin SP
-                inputs:
-                  targetType: 'inline'
-                  script: |
+              - powershell: |
                     $Form = @{
                         grant_type  = 'client_credentials'
                         client_id   = '$(clientId)'
-                        client_secret      = '$(clientSecret)'
+                        client_secret = "$env:CLIENT_SECRET"
                         scope     = 'https://westeurope.asazure.windows.net/.default'
                     }
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     Write-Host "##vso[task.setvariable variable=access_token]$token"
+                env:
+                  CLIENT_SECRET : $(clientSecret)
+                displayName: Step 0 - Get Token for AAS admin SP
               - task: CmdLine@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
