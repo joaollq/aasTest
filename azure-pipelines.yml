@@ -49,21 +49,23 @@ stages:
              $DownloadDest = join-path (get-location) "TabularEditor.zip"
             
              Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
-
-              Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
+              
+              $tabularFolder = join-path (get-location) "TabularEditor"
+              
+              Expand-Archive -Path $DownloadDest -DestinationPath $tabularFolder
               Remove-Item $DownloadDest
             
-              $tabularExe = (get-location).Path
-              Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
+              
+              Write-Host "##vso[task.setvariable variable=tabularFolder]$tabularFolder"
         - task: CmdLine@2
           displayName: Best Practice Analysis
           inputs:
-            script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+            script: './$(tabularFolder)/TabularEditor.exe "TestAAS/Model.bim" -A -V'
       
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
           inputs:
-            PathtoPublish: '$(tabularExe)'
+            PathtoPublish: '$(tabularFolder)'
             ArtifactName: 'drop'
             publishLocation: 'Container'
             StoreAsTar: false
@@ -102,10 +104,9 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
               - task: CmdLine@2
-                displayName: Best Practice Analysis
                 inputs:
                   script: 'TabularEditor.exe "$(Agent.BuildDirectory)/s/TestAAS/Model.bim" -A -V'
-                  workingDirectory: '../drop'
+                  workingDirectory: '../drop/TabularEditor'
 - stage: "DevTask"
   displayName: "DEV Task"
   condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
