@@ -106,7 +106,6 @@ stages:
               - task: CmdLine@2
                 inputs:
                   script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-                  workingDirectory: '../drop/TabularEditor'
 - stage: "DevTask"
   displayName: "DEV Task"
   condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
