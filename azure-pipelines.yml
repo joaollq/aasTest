@@ -60,7 +60,7 @@ stages:
         - task: CmdLine@2
           displayName: Best Practice Analysis
           inputs:
-            script: './$(tabularFolder)/TabularEditor.exe "TestAAS/Model.bim" -A -V'
+            script: '"$(tabularFolder)/TabularEditor.exe" "TestAAS/Model.bim" -A -V'
       
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
