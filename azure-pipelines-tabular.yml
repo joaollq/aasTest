@@ -121,7 +121,7 @@ stages:
         inputs:
           # Add here the emails of the users that need to be notified
           notifyUsers: |
-                johndoe@shell.com
+                joao.quiterio@outlook.com
           # Customize the message that is sent with the email
           instructions: 'Please validate the build configuration and resume'
     - deployment: Deploy
