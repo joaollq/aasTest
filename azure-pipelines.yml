@@ -53,7 +53,7 @@ stages:
               Expand-Archive -Path $DownloadDest -DestinationPath (get-location).Path
               Remove-Item $DownloadDest
             
-              $tabularExe = join-path (get-location) "TabularEditor.exe"
+              $tabularExe = (get-location).Path
               Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
         - task: CmdLine@2
           displayName: Best Practice Analysis
