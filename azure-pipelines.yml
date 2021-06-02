@@ -55,7 +55,10 @@ stages:
             
               $tabularExe = join-path (get-location) "TabularEditor.exe"
               Write-Host "##vso[task.setvariable variable=tabularExe]$tabularExe"
-       
+        - task: CmdLine@2
+          displayName: Best Practice Analysis
+          inputs:
+            script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
       
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
@@ -85,11 +88,6 @@ stages:
           deploy:
             steps:
               - checkout: self
-              - task: CmdLine@2
-                inputs:
-                  script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
-                  workingDirectory: '../drop'
-              
               - task: PowerShell@2
                 displayName: Get Token
                 inputs:
@@ -104,13 +102,13 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     
-                    $p = Start-Process -filePath TabularEditor.exe -Wait -NoNewWindow -PassThru -ArgumentList "`"C:\Shell\ShellAASDemo\TestAAS\Modela.bim`" -D `"Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$token;Persist Security Info=True;Impersonation Level=Impersonate`" `"adventureworks`" -O -C -P -V -E -W"
+                    $p = Start-Process -filePath TabularEditor.exe -Wait -NoNewWindow -PassThru -ArgumentList "-A -V"
                    
                     exit $p.ExitCode
                   workingDirectory: '../drop'
 - stage: "DevTask"
   displayName: "DEV Task"
-  condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
   jobs:
     - deployment: Deploy
       pool:
