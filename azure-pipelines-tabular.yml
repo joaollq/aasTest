@@ -11,19 +11,19 @@
 trigger:
  branches:
   include:
-    - main
+    - develop
     - production
 
 variables:
 # Branch names variables
-# Change these variables to fit your project's needs  
-  - name: mainBranchName
-    value: 'refs/heads/main'
+# Change these variables to fit your project's needs
+  - name: developBranchName
+    value: 'refs/heads/develop'
     readonly: true
   - name: productionBranchName
     value: 'refs/heads/production'
     readonly: true
-  
+
 
 
 stages:
@@ -40,28 +40,28 @@ stages:
         vmImage: "windows-latest"
       steps:
         - task: PowerShell@2
-          displayName: Install tabular editor
+          displayName: Step 0 - Download tabular editor
           inputs:
             targetType: 'inline'
             script: |
-             $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/latest/download/TabularEditor.Portable.zip" 
-            
+             $TabularEditorDownloadUrl = "https://github.com/otykier/TabularEditor/releases/latest/download/TabularEditor.Portable.zip"
+
              $DownloadDest = join-path (get-location) "TabularEditor.zip"
-            
+
              Invoke-WebRequest -Uri $TabularEditorDownloadUrl -OutFile $DownloadDest
-              
+
               $tabularFolder = join-path (get-location) "TabularEditor"
-              
+
               Expand-Archive -Path $DownloadDest -DestinationPath $tabularFolder
               Remove-Item $DownloadDest
-            
-              
+
+
               Write-Host "##vso[task.setvariable variable=tabularFolder]$tabularFolder"
         - task: CmdLine@2
-          displayName: Best Practice Analysis
+          displayName: Step 1 - Best Practice Analysis
           inputs:
             script: '"$(tabularFolder)/TabularEditor.exe" "TestAAS/Model.bim" -A -V'
-      
+
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
           inputs:
@@ -76,9 +76,9 @@ stages:
 # to the current project
 
 # ------- DEV -------
-- stage: "DevTabular"
-  displayName: "DEV Tabular Editor"
-  condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
+- stage: "Dev"
+  displayName: "DEV"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.developBranchName }}')
   jobs:
     - deployment: Deploy
       pool:
@@ -91,7 +91,7 @@ stages:
             steps:
               - checkout: self
               - task: PowerShell@2
-                displayName: Get Token
+                displayName: Step 0 - Get Token for AAS admin SP
                 inputs:
                   targetType: 'inline'
                   script: |
@@ -105,35 +105,9 @@ stages:
                     $token = $LoginResponse.access_token
                     Write-Host "##vso[task.setvariable variable=access_token]$token"
               - task: CmdLine@2
+                displayName: Step 1 - Deploy model to AAS
                 inputs:
                   script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-- stage: "DevTask"
-  displayName: "DEV Task"
-  condition: eq(variables['Build.SourceBranch'], '${{ variables.mainBranchName }}')
-  jobs:
-    - deployment: Deploy
-      pool:
-        vmImage: "windows-latest"
-      environment: Dev
-      displayName: "DEV"
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - checkout: self
-              - task: deploy-aas-db@1
-                inputs:
-                  ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-                  ConnectedServiceNameARM: 'ShellTests'
-                  aasServer: 'asazure://westeurope.asazure.windows.net/joaollqtest'
-                  modelName: 'adventureworks'
-                  loginType: 'spn'
-                  tenantId: '$(tenantId)'
-                  appId: '$(clientId)'
-                  appKey: '$(clientSecret)'
-                  pathToModel: 'TestAAS/Model.bim'
-                  connectionType: 'none'
-                  ipDetectionMethod: 'autoDetect'
 # ------- Production -------
 - stage: "Production"
   displayName: "Production"
@@ -148,9 +122,16 @@ stages:
         runOnce:
           deploy:
             steps:
+               - task: ManualValidation@0
+                 inputs:
+                    # Add here the emails of the users that need to be notified
+                    notifyUsers: |
+                      johndoe@shell.com
+                    # Customize the message that is sent with the email
+                    instructions: 'Please validate the build configuration and resume'
               - checkout: self
               - task: PowerShell@2
-                displayName: Get Token
+                displayName: Step 0 - Get Token for AAS admin SP
                 inputs:
                   targetType: 'inline'
                   script: |
@@ -163,9 +144,7 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     Write-Host "##vso[task.setvariable variable=access_token]$token"
-              - task: CmdLine@2
-                displayName: Deploy to AAS
+              -  - task: CmdLine@2
+                displayName: Step 1 - Deploy model to AAS
                 inputs:
-                  script: 'TabularEditor.exe "../TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
-                  workingDirectory: '../drop'
-              
+                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'

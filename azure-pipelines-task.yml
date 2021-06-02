@@ -1,0 +1,98 @@
+# CI/CD startup template v1.0
+# Add this template to your project so that you can easily setup CI/CD on your project.
+#
+# This template contains the following features:
+#   - Automatically triggers a build whenever new code is pushed to main, test, acceptance and production branches
+#   - Automatically starts a release to the correct environement dependent on the branch that triggered the build
+#
+
+# BRANCHES THAT TRIGGER A BUILD
+# Change the branch names (or add or remove branches) so that this fits your project
+trigger:
+ branches:
+  include:
+    - develop
+    - production
+
+variables:
+# Branch names variables
+# Change these variables to fit your project's needs
+  - name: developBranchName
+    value: 'refs/heads/develop'
+    readonly: true
+  - name: productionBranchName
+    value: 'refs/heads/production'
+    readonly: true
+
+
+
+stages:
+# ------------------------------------------------------------------------
+#                             DEPLOY
+# ------------------------------------------------------------------------
+# There is one stage per environement. Please remove the ones that do not apply
+# to the current project
+
+# ------- DEV -------
+- stage: "Dev"
+  displayName: "DEV"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.developBranchName }}')
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: "windows-latest"
+      environment: Dev
+      displayName: "DEV"
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - task: deploy-aas-db@1
+                inputs:
+                  ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+                  ConnectedServiceNameARM: '$(connectedServiceName)'
+                  aasServer: 'asazure://westeurope.asazure.windows.net/joaollqtest'
+                  modelName: 'adventureworks'
+                  loginType: 'spn'
+                  tenantId: '$(tenantId)'
+                  appId: '$(clientId)'
+                  appKey: '$(clientSecret)'
+                  pathToModel: 'TestAAS/Model.bim'
+                  connectionType: 'none'
+                  ipDetectionMethod: 'autoDetect'
+# ------- Production -------
+- stage: "Production"
+  displayName: "Production"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: "windows-latest"
+      environment: Production
+      displayName: "Production"
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+               - task: ManualValidation@0
+                 inputs:
+                    # Add here the emails of the users that need to be notified
+                    notifyUsers: |
+                      johndoe@shell.com
+                    # Customize the message that is sent with the email
+                    instructions: 'Please validate the build configuration and resume'
+              - checkout: self
+              - task: deploy-aas-db@1
+                inputs:
+                  ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+                  ConnectedServiceNameARM: '$(connectedServiceName)'
+                  aasServer: 'asazure://westeurope.asazure.windows.net/joaollqtest'
+                  modelName: 'adventureworks'
+                  loginType: 'spn'
+                  tenantId: '$(tenantId)'
+                  appId: '$(clientId)'
+                  appKey: '$(clientSecret)'
+                  pathToModel: 'TestAAS/Model.bim'
+                  connectionType: 'none'
+                  ipDetectionMethod: 'autoDetect'
