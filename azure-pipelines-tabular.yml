@@ -122,8 +122,8 @@ stages:
         runOnce:
           deploy:
             steps:
-               - task: ManualValidation@0
-                 inputs:
+              - task: ManualValidation@0
+                inputs:
                     # Add here the emails of the users that need to be notified
                     notifyUsers: |
                       johndoe@shell.com
@@ -144,7 +144,7 @@ stages:
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                     $token = $LoginResponse.access_token
                     Write-Host "##vso[task.setvariable variable=access_token]$token"
-              -  - task: CmdLine@2
+              - task: CmdLine@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
                   script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
