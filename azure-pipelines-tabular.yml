@@ -11,14 +11,14 @@
 trigger:
  branches:
   include:
-    - develop
+    - main
     - production
 
 variables:
 # Branch names variables
 # Change these variables to fit your project's needs
   - name: developBranchName
-    value: 'refs/heads/develop'
+    value: 'refs/heads/main'
     readonly: true
   - name: productionBranchName
     value: 'refs/heads/production'
@@ -94,7 +94,7 @@ stages:
                     $Form = @{
                         grant_type  = 'client_credentials'
                         client_id   = '$(clientId)'
-                        client_secret = '14Ks7K.TNOdjgm~Df_8yU~cP2U_lgHXaO4a'
+                        client_secret = '$env:CLIENT_SECRET'
                         scope     = 'https://westeurope.asazure.windows.net/.default'
                     }
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
@@ -113,6 +113,18 @@ stages:
   displayName: "Production"
   condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
   jobs:
+    - job: waitForValidation
+      displayName: Wait for external validation  
+      pool: server    
+      timeoutInMinutes: ${{ variables.timeOutInMinutesVariable }} 
+      steps:   
+      - task: ManualValidation@0
+        inputs:
+          # Add here the emails of the users that need to be notified
+          notifyUsers: |
+                johndoe@shell.com
+          # Customize the message that is sent with the email
+          instructions: 'Please validate the build configuration and resume'
     - deployment: Deploy
       pool:
         vmImage: "windows-latest"
@@ -122,13 +134,6 @@ stages:
         runOnce:
           deploy:
             steps:
-              - task: ManualValidation@0
-                inputs:
-                    # Add here the emails of the users that need to be notified
-                    notifyUsers: |
-                      johndoe@shell.com
-                    # Customize the message that is sent with the email
-                    instructions: 'Please validate the build configuration and resume'
               - checkout: self
               - task: PowerShell@2
                 displayName: Step 0 - Get Token for AAS admin SP
