@@ -94,7 +94,7 @@ stages:
                     $Form = @{
                         grant_type  = 'client_credentials'
                         client_id   = '$(clientId)'
-                        client_secret = '$env:CLIENT_SECRET'
+                        client_secret = '14Ks7K.TNOdjgm~Df_8yU~cP2U_lgHXaO4'
                         scope     = 'https://westeurope.asazure.windows.net/.default'
                     }
                     $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
