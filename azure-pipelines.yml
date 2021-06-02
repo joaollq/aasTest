@@ -104,7 +104,7 @@ stages:
               - task: CmdLine@2
                 displayName: Best Practice Analysis
                 inputs:
-                  script: 'TabularEditor.exe "TestAAS/Model.bim" -A -V'
+                  script: 'TabularEditor.exe "$(Agent.BuildDirectory)/s/TestAAS/Model.bim" -A -V'
                   workingDirectory: '../drop'
 - stage: "DevTask"
   displayName: "DEV Task"
