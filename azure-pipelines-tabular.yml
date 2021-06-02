@@ -125,6 +125,9 @@ stages:
           # Customize the message that is sent with the email
           instructions: 'Please validate the build configuration and resume'
     - deployment: Deploy
+      dependsOn:
+      - waitForValidation
+      condition: succeeded('waitForValidation')
       pool:
         vmImage: "windows-latest"
       environment: Production
