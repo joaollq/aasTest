@@ -149,13 +149,13 @@ stages:
                   # Create JWT payload
                   $JWTPayLoad = @{
                       # What endpoint is allowed to use this JWT
-                      aud = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+                      aud = "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token"
                       
                       # Expiration timestamp
                       exp = $JWTExpiration
                       
                       # Issuer = your application
-                      iss = $clientId
+                      iss = $env:CLIENT_ID
                       
                       # JWT ID: random guid
                       jti = [guid]::NewGuid()
@@ -206,6 +206,8 @@ stages:
                 displayName: Step 0.2 - Get Token for AAS admin SP using certificate
                 env:
                   CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
+                  TENANT_ID : $(tenantId)
 
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
