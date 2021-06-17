@@ -11,14 +11,14 @@
 trigger:
  branches:
   include:
-    - develop
+    - main
     - production
 
 variables:
 # Branch names variables
 # Change these variables to fit your project's needs
   - name: developBranchName
-    value: 'refs/heads/develop'
+    value: 'refs/heads/main'
     readonly: true
   - name: productionBranchName
     value: 'refs/heads/production'
@@ -67,7 +67,21 @@ stages:
   displayName: "Production"
   condition: eq(variables['Build.SourceBranch'], '${{ variables.productionBranchName }}')
   jobs:
+    - job: waitForValidation
+      displayName: Wait for external validation  
+      pool: server    
+      steps:   
+      - task: ManualValidation@0
+        inputs:
+          # Add here the emails of the users that need to be notified
+          notifyUsers: |
+                joao.quiterio@outlook.com
+          # Customize the message that is sent with the email
+          instructions: 'Please validate the build configuration and resume'
     - deployment: Deploy
+      dependsOn:
+        - waitForValidation
+      condition: succeeded('waitForValidation')
       pool:
         vmImage: "windows-latest"
       environment: Production
@@ -76,13 +90,6 @@ stages:
         runOnce:
           deploy:
             steps:
-              - task: ManualValidation@0
-                inputs:
-                    # Add here the emails of the users that need to be notified
-                    notifyUsers: |
-                      johndoe@shell.com
-                    # Customize the message that is sent with the email
-                    instructions: 'Please validate the build configuration and resume'
               - checkout: self
               - task: deploy-aas-db@1
                 displayName : Step 1 - Deploy Model to AAS
