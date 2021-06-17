@@ -23,6 +23,8 @@ variables:
   - name: productionBranchName
     value: 'refs/heads/production'
     readonly: true
+  - name: bimRootFolder
+    value : 'TestAAS'
 
 
 
@@ -60,7 +62,7 @@ stages:
         - task: CmdLine@2
           displayName: Step 1 - Best Practice Analysis
           inputs:
-            script: '"$(tabularFolder)/TabularEditor.exe" "TestAAS/Model.bim" -A -V'
+            script: '"$(tabularFolder)/TabularEditor.exe" "${{ variables.bimRootFolder }}/Model.bim" -A -V'
 
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
@@ -107,7 +109,7 @@ stages:
               - task: CmdLine@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
-                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "${{ variables.bimRootFolder }}/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
 # ------- Production -------
 - stage: "Production"
   displayName: "Production"
@@ -153,4 +155,4 @@ stages:
               - task: CmdLine@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
-                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "TestAAS/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "${{ variables.bimRootFolder }}/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
