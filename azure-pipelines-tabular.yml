@@ -78,6 +78,13 @@ stages:
             ArtifactName: 'drop'
             publishLocation: 'Container'
             StoreAsTar: false
+
+        - task: PublishBuildArtifacts@1
+          displayName: Publish cert
+          inputs:
+            PathtoPublish: 'cert.pfx'
+            ArtifactName: 'cert'
+            publishLocation: 'Container'
 # ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
@@ -114,7 +121,7 @@ stages:
                 displayName: Step 0.1 - Get Token for AAS admin SP
 
               - powershell: |
-                  $Certificate = Get-Item Cert:\LocalMachine\My\7d17c4c54cdd9834d06ddb0a47a18b8b640bf641
+                  $Certificate = Get-PfxCertificate -FilePath $(Agent.BuildDirectory)/cert/cert.pfx -Password $env:CERT_PASS
      
                   # Create base64 hash of certificate
                   $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
@@ -194,6 +201,8 @@ stages:
                   $token = $LoginResponse.access_token
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.2 - Get Token for AAS admin SP using certificate
+                env:
+                  CERT_PASS : $(certPassword)
 
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
