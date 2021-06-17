@@ -67,9 +67,9 @@ stages:
             script: |
               $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
                             
-                            foreach ($model in $models) {
-                                "$(tabularFolder)/TabularEditor.exe" "$model.FullName" -A -V
-                            }
+              foreach ($model in $models) {
+                $(tabularFolder)/TabularEditor.exe $model.FullName -A -V
+              }
 
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
