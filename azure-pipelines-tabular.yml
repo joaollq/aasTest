@@ -196,7 +196,7 @@ stages:
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = '$(clientId)'
-                      client_assertion = "$JWT"
+                      client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = 'https://westeurope.asazure.windows.net/.default'
                   }
