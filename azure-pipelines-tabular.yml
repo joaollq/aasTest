@@ -59,15 +59,8 @@ stages:
 
 
               Write-Host "##vso[task.setvariable variable=tabularFolder]$tabularFolder"
-        - task: CmdLine@2
-          displayName: Step 1 - Best Practice Analysis
-          inputs:
-            script: |
-              $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
-              
-              foreach ($model in $models) {
-                  "$(tabularFolder)/TabularEditor.exe" "$model.FullName" -A -V
-              }
+      
+        
 
         - task: PublishBuildArtifacts@1
           displayName: Publish TabularEditor
