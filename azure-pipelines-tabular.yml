@@ -121,7 +121,7 @@ stages:
                     $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
                                   
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe" $model.FullName -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
                     
 # ------- Production -------
