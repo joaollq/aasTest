@@ -122,7 +122,7 @@ stages:
 
               - powershell: |
                   $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-                  $Certificate.Import($(Agent.BuildDirectory)/cert/cert.pfx,$env:CERT_PASS,'DefaultKeySet')
+                  $Certificate.Import("$(Agent.BuildDirectory)"/cert/cert.pfx,"$env:CERT_PASS",'DefaultKeySet')
                   
      
                   # Create base64 hash of certificate
