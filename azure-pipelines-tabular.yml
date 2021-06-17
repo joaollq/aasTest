@@ -164,7 +164,7 @@ stages:
                       nbf = $NotBefore
                       
                       # JWT Subject
-                      sub = $AppId
+                      sub = $env:CLIENT_ID
                   }
     
                   # Convert header and payload to base64
