@@ -166,7 +166,13 @@ stages:
                 env:
                   CLIENT_SECRET : $(clientSecret)
                 displayName: Step 0 - Get Token for AAS admin SP
-              - task: CmdLine@2
+              - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
-                  script: '"$(Agent.BuildDirectory)/drop/TabularEditor.exe" "${{ variables.bimRootFolder }}/Model.bim" -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V'
+                  targetType: 'inline'
+                  script: |
+                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                                  
+                    foreach ($model in $models) {
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                    }
