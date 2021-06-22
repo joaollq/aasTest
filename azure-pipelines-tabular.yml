@@ -204,12 +204,12 @@ stages:
                    
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(clientId)'
+                      client_id   = '$env:CLIENT_ID'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                      scope     = 'https://$env:AZURE_REGION.asazure.windows.net/.default'
                   }
-                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
@@ -217,6 +217,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : {{ variables.azureRegion }}
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
