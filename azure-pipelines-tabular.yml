@@ -3,7 +3,7 @@
 #
 # This template contains the following features:
 #   - Automatically triggers a build whenever new code is pushed to main, test, acceptance and production branches
-#   - Automatically starts a release to the correct environement dependent on the branch that triggered the build
+#   - Automatically starts a release to the correct environment dependent on the branch that triggered the build
 #
 
 # BRANCHES THAT TRIGGER A BUILD
@@ -12,19 +12,34 @@ trigger:
  branches:
   include:
     - main
+    - test
+    - acceptance
     - production
 
 variables:
 # Branch names variables
 # Change these variables to fit your project's needs
-  - name: developBranchName
-    value: 'refs/heads/main'
-    readonly: true
-  - name: productionBranchName
-    value: 'refs/heads/production'
-    readonly: true
-  - name: bimRootFolder
-    value : 'TestAAS'
+    - name: developBranchName
+      value: 'refs/heads/main'
+      readonly: true
+    - name: testBranchName
+      value: 'refs/heads/test'
+      readonly: true
+    - name: acceptanceBranchName
+      value: 'refs/heads/acceptance'
+      readonly: true
+    - name: productionBranchName
+      value: 'refs/heads/production'
+      readonly: true
+    - name: bimRootFolder
+      value: 'TestAAS'
+      readonly: true
+    - name: azureRegion
+      value: 'westeurope'
+      readonly: true
+    - name: aasInstanceName
+      value: 'joaollqtest'
+      readonly: true
 
 
 
@@ -59,7 +74,6 @@ stages:
 
 
               Write-Host "##vso[task.setvariable variable=tabularFolder]$tabularFolder"
-      
         - task: PowerShell@2
           displayName: Step 1 - Best Practice Analysis
           inputs:
@@ -78,17 +92,10 @@ stages:
             ArtifactName: 'drop'
             publishLocation: 'Container'
             StoreAsTar: false
-
-        - task: PublishBuildArtifacts@1
-          displayName: Publish cert
-          inputs:
-            PathtoPublish: 'cert.pfx'
-            ArtifactName: 'cert'
-            publishLocation: 'Container'
 # ------------------------------------------------------------------------
 #                             DEPLOY
 # ------------------------------------------------------------------------
-# There is one stage per environement. Please remove the ones that do not apply
+# There is one stage per environment. Please remove the ones that do not apply
 # to the current project
 
 # ------- DEV -------
@@ -106,23 +113,26 @@ stages:
           deploy:
             steps:
               - checkout: self
-              - powershell: |
-                    $Form = @{
-                        grant_type  = 'client_credentials'
-                        client_id   = '$(clientId)'
-                        client_secret = "$env:CLIENT_SECRET"
-                        scope     = 'https://westeurope.asazure.windows.net/.default'
-                    }
-                    $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
-                    $token = $LoginResponse.access_token
-                    Write-Host "##vso[task.setvariable variable=access_token]$token"
-                env:
-                  CLIENT_SECRET : $(clientSecret)
-                displayName: Step 0.1 - Get Token for AAS admin SP
+ # Uncomment this section if you are using client secrets
+ #             - powershell: |
+ #                   $Form = @{
+ #                       grant_type  = 'client_credentials'
+ #                       client_id   = '$(clientId)'
+ #                        client_secret = "$env:CLIENT_SECRET"
+ #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+ #                   }
+ #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
+ #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+ #                   $token = $LoginResponse.access_token
+ #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+ #              env:
+ #                CLIENT_SECRET : $(clientSecret)
+ #              displayName: Step 0.1 - Get Token for AAS admin SP
 
               - powershell: |
+                  $certPath = "cert.pfx"
                   $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-                  $Certificate.Import($(Agent.BuildDirectory)/cert/cert.pfx,$env:CERT_PASS,'DefaultKeySet')
+                  $Certificate.Import($certPath,$env:CERT_PASS,0)
                   
      
                   # Create base64 hash of certificate
@@ -148,13 +158,13 @@ stages:
                   # Create JWT payload
                   $JWTPayLoad = @{
                       # What endpoint is allowed to use this JWT
-                      aud = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+                      aud = "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token"
                       
                       # Expiration timestamp
                       exp = $JWTExpiration
                       
                       # Issuer = your application
-                      iss = $clientId
+                      iss = $env:CLIENT_ID
                       
                       # JWT ID: random guid
                       jti = [guid]::NewGuid()
@@ -163,7 +173,143 @@ stages:
                       nbf = $NotBefore
                       
                       # JWT Subject
-                      sub = $AppId
+                      sub = $env:CLIENT_ID
+                  }
+    
+                  # Convert header and payload to base64
+                  $JWTHeaderToByte = [System.Text.Encoding]::UTF8.GetBytes(($JWTHeader | ConvertTo-Json))
+                  $EncodedHeader = [System.Convert]::ToBase64String($JWTHeaderToByte)
+                      
+                  $JWTPayLoadToByte =  [System.Text.Encoding]::UTF8.GetBytes(($JWTPayload | ConvertTo-Json))
+                  $EncodedPayload = [System.Convert]::ToBase64String($JWTPayLoadToByte)
+                      
+                  # Join header and Payload with "." to create a valid (unsigned) JWT
+                  $JWT = $EncodedHeader + "." + $EncodedPayload
+                      
+                  # Get the private key object of your certificate
+                  $PrivateKey = ([System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate))
+                      
+                  # Define RSA signature and hashing algorithm
+                  $RSAPadding = [Security.Cryptography.RSASignaturePadding]::Pkcs1
+                  $HashAlgorithm = [Security.Cryptography.HashAlgorithmName]::SHA256
+    
+    
+                  # Create a signature of the JWT
+                  $Signature = [Convert]::ToBase64String(
+                      $PrivateKey.SignData([System.Text.Encoding]::UTF8.GetBytes($JWT),$HashAlgorithm,$RSAPadding)
+                  ) -replace '\+','-' -replace '/','_' -replace '='
+                      
+                  # Join the signature to the JWT with "."
+                  $JWT = $JWT + "." + $Signature
+                   
+                   $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default'
+
+                  $Form = @{
+                      grant_type  = 'client_credentials'
+                      client_id   = '$(clientId)'
+                      client_assertion = $JWT
+                      client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+                      scope = $scope
+                  }
+
+                  $url = 'https://login.microsoftonline.com/' + $env:TENANT_ID + '/oauth2/v2.0/token'
+
+                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri $url -Method 'POST' -Body $Form)
+                  $token = $LoginResponse.access_token
+                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+                displayName: Step 0.1 - Get Token for AAS admin SP using certificate
+                env:
+                  CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
+                  TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
+                  
+              - task: PowerShell@2
+                displayName: Step 1 - Deploy model to AAS
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+
+                    foreach ($model in $models) {
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                    }
+# ------- Test -------
+- stage: "Test"
+  displayName: "TEST"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.testBranchName }}')
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: "windows-latest"
+      environment: Test
+      displayName: "TEST"
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+ # Uncomment this section if you are using client secrets
+ #             - powershell: |
+ #                   $Form = @{
+ #                       grant_type  = 'client_credentials'
+ #                       client_id   = '$(clientId)'
+ #                        client_secret = "$env:CLIENT_SECRET"
+ #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+ #                   }
+ #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
+ #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+ #                   $token = $LoginResponse.access_token
+ #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+ #              env:
+ #                CLIENT_SECRET : $(clientSecret)
+ #              displayName: Step 0.1 - Get Token for AAS admin SP
+
+              - powershell: |
+                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
+                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                  $Certificate.Import($certPath,$env:CERT_PASS,0)
+                  
+     
+                  # Create base64 hash of certificate
+                  $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
+    
+                  # Create JWT timestamp for expiration
+                  $StartDate = (Get-Date "1970-01-01T00:00:00Z" ).ToUniversalTime()
+                  $JWTExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End (Get-Date).ToUniversalTime().AddMinutes(2)).TotalSeconds
+                  $JWTExpiration = [math]::Round($JWTExpirationTimeSpan,0)
+    
+                  # Create JWT validity start timestamp
+                  $NotBeforeExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End ((Get-Date).ToUniversalTime())).TotalSeconds
+                  $NotBefore = [math]::Round($NotBeforeExpirationTimeSpan,0)
+    
+                  # Create JWT header
+                  $JWTHeader = @{
+                      alg = "RS256"
+                      typ = "JWT"
+                      # Use the CertificateBase64Hash and replace/strip to match web encoding of base64
+                      x5t = $CertificateBase64Hash -replace '\+','-' -replace '/','_' -replace '='
+                  }
+    
+                  # Create JWT payload
+                  $JWTPayLoad = @{
+                      # What endpoint is allowed to use this JWT
+                      aud = "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token"
+                      
+                      # Expiration timestamp
+                      exp = $JWTExpiration
+                      
+                      # Issuer = your application
+                      iss = $env:CLIENT_ID
+                      
+                      # JWT ID: random guid
+                      jti = [guid]::NewGuid()
+                      
+                      # Not to be used before
+                      nbf = $NotBefore
+                      
+                      # JWT Subject
+                      sub = $env:CLIENT_ID
                   }
     
                   # Convert header and payload to base64
@@ -195,17 +341,152 @@ stages:
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = '$(clientId)'
-                      client_assertion = "$JWT"
+                      client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope     = 'https://westeurope.asazure.windows.net/.default'
+                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
                   }
                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
-                displayName: Step 0.2 - Get Token for AAS admin SP using certificate
+                displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
                   CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
+                  TENANT_ID : $(tenantId)
+                  
+              - task: PowerShell@2
+                displayName: Step 1 - Deploy model to AAS
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
+                    foreach ($model in $models) {
+                      echo  $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "$connectionStrings.dev.'$model.Name'$(access_token)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "$connectionStrings.dev.'$model.Name'$(access_token)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                    }
+
+# ------- Acceptance -------
+- stage: "Acceptance"
+  displayName: "ACCEPTANCE"
+  condition: eq(variables['Build.SourceBranch'], '${{ variables.acceptanceBranchName }}')
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: "windows-latest"
+      environment: Acceptance
+      displayName: "ACCEPTANCE"
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+ # Uncomment this section if you are using client secrets
+ #             - powershell: |
+ #                   $Form = @{
+ #                       grant_type  = 'client_credentials'
+ #                       client_id   = '$(clientId)'
+ #                        client_secret = "$env:CLIENT_SECRET"
+ #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+ #                   }
+ #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
+ #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+ #                   $token = $LoginResponse.access_token
+ #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+ #              env:
+ #                CLIENT_SECRET : $(clientSecret)
+ #              displayName: Step 0.1 - Get Token for AAS admin SP
+
+              - powershell: |
+                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
+                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                  $Certificate.Import($certPath,$env:CERT_PASS,0)
+                  
+     
+                  # Create base64 hash of certificate
+                  $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
+    
+                  # Create JWT timestamp for expiration
+                  $StartDate = (Get-Date "1970-01-01T00:00:00Z" ).ToUniversalTime()
+                  $JWTExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End (Get-Date).ToUniversalTime().AddMinutes(2)).TotalSeconds
+                  $JWTExpiration = [math]::Round($JWTExpirationTimeSpan,0)
+    
+                  # Create JWT validity start timestamp
+                  $NotBeforeExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End ((Get-Date).ToUniversalTime())).TotalSeconds
+                  $NotBefore = [math]::Round($NotBeforeExpirationTimeSpan,0)
+    
+                  # Create JWT header
+                  $JWTHeader = @{
+                      alg = "RS256"
+                      typ = "JWT"
+                      # Use the CertificateBase64Hash and replace/strip to match web encoding of base64
+                      x5t = $CertificateBase64Hash -replace '\+','-' -replace '/','_' -replace '='
+                  }
+    
+                  # Create JWT payload
+                  $JWTPayLoad = @{
+                      # What endpoint is allowed to use this JWT
+                      aud = "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token"
+                      
+                      # Expiration timestamp
+                      exp = $JWTExpiration
+                      
+                      # Issuer = your application
+                      iss = $env:CLIENT_ID
+                      
+                      # JWT ID: random guid
+                      jti = [guid]::NewGuid()
+                      
+                      # Not to be used before
+                      nbf = $NotBefore
+                      
+                      # JWT Subject
+                      sub = $env:CLIENT_ID
+                  }
+    
+                  # Convert header and payload to base64
+                  $JWTHeaderToByte = [System.Text.Encoding]::UTF8.GetBytes(($JWTHeader | ConvertTo-Json))
+                  $EncodedHeader = [System.Convert]::ToBase64String($JWTHeaderToByte)
+                      
+                  $JWTPayLoadToByte =  [System.Text.Encoding]::UTF8.GetBytes(($JWTPayload | ConvertTo-Json))
+                  $EncodedPayload = [System.Convert]::ToBase64String($JWTPayLoadToByte)
+                      
+                  # Join header and Payload with "." to create a valid (unsigned) JWT
+                  $JWT = $EncodedHeader + "." + $EncodedPayload
+                      
+                  # Get the private key object of your certificate
+                  $PrivateKey = ([System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate))
+                      
+                  # Define RSA signature and hashing algorithm
+                  $RSAPadding = [Security.Cryptography.RSASignaturePadding]::Pkcs1
+                  $HashAlgorithm = [Security.Cryptography.HashAlgorithmName]::SHA256
+    
+    
+                  # Create a signature of the JWT
+                  $Signature = [Convert]::ToBase64String(
+                      $PrivateKey.SignData([System.Text.Encoding]::UTF8.GetBytes($JWT),$HashAlgorithm,$RSAPadding)
+                  ) -replace '\+','-' -replace '/','_' -replace '='
+                      
+                  # Join the signature to the JWT with "."
+                  $JWT = $JWT + "." + $Signature
+                   
+                  $Form = @{
+                      grant_type  = 'client_credentials'
+                      client_id   = '$(clientId)'
+                      client_assertion = $JWT
+                      client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                  }
+                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+                  $token = $LoginResponse.access_token
+                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+                displayName: Step 0.1 - Get Token for AAS admin SP using certificate
+                env:
+                  CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
+                  TENANT_ID : $(tenantId)
+                  
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
@@ -214,9 +495,9 @@ stages:
                     $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
                                   
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://{{ variables.azureRegion }}.asazure.windows.net/{{ variables.aasInstanceName }};Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
-                    
+
 # ------- Production -------
 - stage: "Production"
   displayName: "Production"
@@ -230,7 +511,7 @@ stages:
         inputs:
           # Add here the emails of the users that need to be notified
           notifyUsers: |
-                joao.quiterio@outlook.com
+                username@example.com
           # Customize the message that is sent with the email
           instructions: 'Please validate the build configuration and resume'
     - deployment: Deploy
@@ -246,19 +527,111 @@ stages:
           deploy:
             steps:
               - checkout: self
+ # Uncomment this section if you are using client secrets
+ #             - powershell: |
+ #                   $Form = @{
+ #                       grant_type  = 'client_credentials'
+ #                       client_id   = '$(clientId)'
+ #                        client_secret = "$env:CLIENT_SECRET"
+ #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+ #                   }
+ #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
+ #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+ #                   $token = $LoginResponse.access_token
+ #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+ #              env:
+ #                CLIENT_SECRET : $(clientSecret)
+ #              displayName: Step 0.1 - Get Token for AAS admin SP
+
               - powershell: |
-                    $Form = @{
-                        grant_type  = 'client_credentials'
-                        client_id   = '$(clientId)'
-                        client_secret = "$env:CLIENT_SECRET"
-                        scope     = 'https://westeurope.asazure.windows.net/.default'
-                    }
-                    $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
-                    $token = $LoginResponse.access_token
-                    Write-Host "##vso[task.setvariable variable=access_token]$token"
+                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
+                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                  $Certificate.Import($certPath,$env:CERT_PASS,0)
+                  
+     
+                  # Create base64 hash of certificate
+                  $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
+    
+                  # Create JWT timestamp for expiration
+                  $StartDate = (Get-Date "1970-01-01T00:00:00Z" ).ToUniversalTime()
+                  $JWTExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End (Get-Date).ToUniversalTime().AddMinutes(2)).TotalSeconds
+                  $JWTExpiration = [math]::Round($JWTExpirationTimeSpan,0)
+    
+                  # Create JWT validity start timestamp
+                  $NotBeforeExpirationTimeSpan = (New-TimeSpan -Start $StartDate -End ((Get-Date).ToUniversalTime())).TotalSeconds
+                  $NotBefore = [math]::Round($NotBeforeExpirationTimeSpan,0)
+    
+                  # Create JWT header
+                  $JWTHeader = @{
+                      alg = "RS256"
+                      typ = "JWT"
+                      # Use the CertificateBase64Hash and replace/strip to match web encoding of base64
+                      x5t = $CertificateBase64Hash -replace '\+','-' -replace '/','_' -replace '='
+                  }
+    
+                  # Create JWT payload
+                  $JWTPayLoad = @{
+                      # What endpoint is allowed to use this JWT
+                      aud = "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token"
+                      
+                      # Expiration timestamp
+                      exp = $JWTExpiration
+                      
+                      # Issuer = your application
+                      iss = $env:CLIENT_ID
+                      
+                      # JWT ID: random guid
+                      jti = [guid]::NewGuid()
+                      
+                      # Not to be used before
+                      nbf = $NotBefore
+                      
+                      # JWT Subject
+                      sub = $env:CLIENT_ID
+                  }
+    
+                  # Convert header and payload to base64
+                  $JWTHeaderToByte = [System.Text.Encoding]::UTF8.GetBytes(($JWTHeader | ConvertTo-Json))
+                  $EncodedHeader = [System.Convert]::ToBase64String($JWTHeaderToByte)
+                      
+                  $JWTPayLoadToByte =  [System.Text.Encoding]::UTF8.GetBytes(($JWTPayload | ConvertTo-Json))
+                  $EncodedPayload = [System.Convert]::ToBase64String($JWTPayLoadToByte)
+                      
+                  # Join header and Payload with "." to create a valid (unsigned) JWT
+                  $JWT = $EncodedHeader + "." + $EncodedPayload
+                      
+                  # Get the private key object of your certificate
+                  $PrivateKey = ([System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate))
+                      
+                  # Define RSA signature and hashing algorithm
+                  $RSAPadding = [Security.Cryptography.RSASignaturePadding]::Pkcs1
+                  $HashAlgorithm = [Security.Cryptography.HashAlgorithmName]::SHA256
+    
+    
+                  # Create a signature of the JWT
+                  $Signature = [Convert]::ToBase64String(
+                      $PrivateKey.SignData([System.Text.Encoding]::UTF8.GetBytes($JWT),$HashAlgorithm,$RSAPadding)
+                  ) -replace '\+','-' -replace '/','_' -replace '='
+                      
+                  # Join the signature to the JWT with "."
+                  $JWT = $JWT + "." + $Signature
+                   
+                  $Form = @{
+                      grant_type  = 'client_credentials'
+                      client_id   = '$(clientId)'
+                      client_assertion = $JWT
+                      client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                  }
+                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+                  $token = $LoginResponse.access_token
+                  Write-Host "##vso[task.setvariable variable=access_token]$token"
+                displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
-                  CLIENT_SECRET : $(clientSecret)
-                displayName: Step 0 - Get Token for AAS admin SP
+                  CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
+                  TENANT_ID : $(tenantId)
+
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
@@ -267,5 +640,5 @@ stages:
                     $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
                                   
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://{{ variables.azureRegion }}.asazure.windows.net/{{ variables.aasInstanceName }};Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
