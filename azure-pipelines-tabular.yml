@@ -634,5 +634,3 @@ stages:
                     foreach ($model in $models) {
                       $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://{{ variables.azureRegion }}.asazure.windows.net/{{ variables.aasInstanceName }};Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
-
-```
