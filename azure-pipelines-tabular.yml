@@ -173,7 +173,7 @@ stages:
                       nbf = $NotBefore
                       
                       # JWT Subject
-                      sub = $env:CLIENT_ID
+                      sub = $(clientId)
                   }
     
                   # Convert header and payload to base64
@@ -220,7 +220,6 @@ stages:
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
                   CERT_PASS : $(certPassword)
-                  CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(azureRegion)
                   
