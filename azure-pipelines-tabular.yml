@@ -41,8 +41,6 @@ variables:
       value: 'joaollqtest'
       readonly: true
 
-
-
 stages:
 # ------------------------------------------------------------------------
 #                             BUILD
