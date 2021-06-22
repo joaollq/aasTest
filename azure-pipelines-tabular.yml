@@ -130,7 +130,7 @@ stages:
  #              displayName: Step 0.1 - Get Token for AAS admin SP
 
               - powershell: |
-                  $certPath = "$(Agent.BuildDirectory)/cert.pfx"
+                  $certPath = "cert.pfx"
                   $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                   $Certificate.Import($certPath,$env:CERT_PASS,0)
                   
