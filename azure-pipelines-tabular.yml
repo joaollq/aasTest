@@ -230,9 +230,11 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      echo  $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "$connectionStrings.dev.'$model.Name'$(access_token)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "$connectionStrings.dev.'$model.Name'$(access_token)" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
 - stage: "Test"
