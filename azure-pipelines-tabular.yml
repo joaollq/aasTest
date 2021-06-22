@@ -41,6 +41,8 @@ variables:
       value: 'joaollqtest'
       readonly: true
 
+
+
 stages:
 # ------------------------------------------------------------------------
 #                             BUILD
@@ -171,7 +173,7 @@ stages:
                       nbf = $NotBefore
                       
                       # JWT Subject
-                      sub = '$(clientId)''
+                      sub = $env:CLIENT_ID
                   }
     
                   # Convert header and payload to base64
@@ -218,6 +220,7 @@ stages:
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
                   CERT_PASS : $(certPassword)
+                  CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(azureRegion)
                   
@@ -229,7 +232,7 @@ stages:
                     $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
                                   
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://{{ variables.azureRegion }}.asazure.windows.net/{{ variables.aasInstanceName }};Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D "Provider=MSOLAP;Data Source=asazure://$(azureRegion).asazure.windows.net/$(aasInstanceName);Initial Catalog=adventureworks;Password=$(access_token);Persist Security Info=True;Impersonation Level=Impersonate" "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
 - stage: "Test"
