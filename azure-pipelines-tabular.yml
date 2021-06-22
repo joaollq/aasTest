@@ -206,12 +206,15 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$env:CLIENT_ID'
+                      client_id   = '$(clientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope = $scope
                   }
-                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token' -Method 'POST' -Body $Form)
+
+                  $url = 'https://login.microsoftonline.com/' + $env:TENANT_ID + '/oauth2/v2.0/token'
+
+                  $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri $url -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
