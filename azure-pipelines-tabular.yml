@@ -32,7 +32,7 @@ variables:
       value: 'refs/heads/production'
       readonly: true
     - name: bimRootFolder
-      value: 'bimRoot'
+      value: 'TestAAS'
       readonly: true
     - name: azureRegion
       value: 'westeurope'
