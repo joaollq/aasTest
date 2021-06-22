@@ -233,7 +233,7 @@ stages:
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
-                      echo  $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.dev.'$model.Name'$(access_token) "$(ASDatabaseName)"
+                      echo  $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName + "-D" + $connectionStrings.dev.'$model.Name'+$(access_token) + "$(ASDatabaseName)"
                       $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.dev.'$model.Name'$(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
