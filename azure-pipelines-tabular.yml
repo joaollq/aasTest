@@ -369,6 +369,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -508,6 +509,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -662,6 +664,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
 
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
