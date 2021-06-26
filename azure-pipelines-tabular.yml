@@ -32,9 +32,6 @@ variables:
     - name: devKeyVaultName
       value: 'joaollqtest'
       readonly: true
-    - name: devCertName
-      value: 'cert'
-      readonly: true
 # TEST
     - name: testBranchName
       value: 'refs/heads/test'
@@ -47,9 +44,6 @@ variables:
       readonly: true
     - name: testKeyVaultName
       value: 'joaollqtest'
-      readonly: true
-    - name: testCertName
-      value: 'cert'
       readonly: true
 # ACCEPTANCE
     - name: acceptanceBranchName
@@ -64,9 +58,6 @@ variables:
     - name: acceptanceKeyVaultName
       value: 'joaollqtest'
       readonly: true
-    - name: acceptanceCertName
-      value: 'cert'
-      readonly: true
 # PRODUCTION
     - name: productionBranchName
       value: 'refs/heads/production'
@@ -79,9 +70,6 @@ variables:
       readonly: true
     - name: productionKeyVaultName
       value: 'joaollqtest'
-      readonly: true
-    - name: productionCertName
-      value: 'cert'
       readonly: true
 #ENV AGNOSTIC
     - name: bimRootFolder
@@ -181,11 +169,10 @@ stages:
                 inputs:
                   azureSubscription: '$(devSubscriptionName)'
                   KeyVaultName: '$(devKeyVaultName)'
-                  SecretsFilter: '$(devCertName)'
+                  SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
-                 $cert= $pipeline.variables.$devCertName.value
-                 $kvSecretBytes = [System.Convert]::FromBase64String($cert)
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   
@@ -325,10 +312,10 @@ stages:
                 inputs:
                   azureSubscription: '$(testSubscriptionName)'
                   KeyVaultName: '$(testKeyVaultName)'
-                  SecretsFilter: '$(testCertName)'
+                  SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
-                 $kvSecretBytes = [System.Convert]::FromBase64String("$($(testCertName))")
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   
@@ -467,10 +454,10 @@ stages:
                 inputs:
                   azureSubscription: '$(acceptanceSubscriptionName)'
                   KeyVaultName: '$(acceptanceKeyVaultName)'
-                  SecretsFilter: '$(acceptanceCertName)'
+                  SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
-                 $kvSecretBytes = [System.Convert]::FromBase64String("$($(acceptanceCertName))")
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   # Create base64 hash of certificate
@@ -620,10 +607,10 @@ stages:
                 inputs:
                   azureSubscription: '$(productionSubscriptionName)'
                   KeyVaultName: '$(productionKeyVaultName)'
-                  SecretsFilter: '$(productionCertName)'
+                  SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
-                 $kvSecretBytes = [System.Convert]::FromBase64String("$($productionCertName))")
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   
