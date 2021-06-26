@@ -11,7 +11,7 @@
 trigger:
  branches:
   include:
-    - main
+    - develop
     - test
     - acceptance
     - production
@@ -20,7 +20,7 @@ variables:
 # Branch names variables
 # Change these variables to fit your project's needs
     - name: developBranchName
-      value: 'refs/heads/main'
+      value: 'refs/heads/develop'
       readonly: true
     - name: testBranchName
       value: 'refs/heads/test'
