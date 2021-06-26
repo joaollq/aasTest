@@ -136,7 +136,7 @@ stages:
                   SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
-                 $kvSecretBytes = [System.Convert]::FromBase64String($(cert))
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   
