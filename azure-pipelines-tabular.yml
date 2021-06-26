@@ -19,27 +19,63 @@ trigger:
 variables:
 # Branch names variables
 # Change these variables to fit your project's needs
+# DEV
     - name: developBranchName
       value: 'refs/heads/develop'
       readonly: true
+    - name: devAzureRegion
+      value: 'westeurope'
+      readonly: true
+    - name: devSubscriptionName
+      value: 'joaollqtest'
+      readonly: true
+    - name: devKeyVaultName
+      value: 'joaollqtest'
+      readonly: true
+# TEST
     - name: testBranchName
       value: 'refs/heads/test'
       readonly: true
+    - name: testAzureRegion
+      value: 'westeurope'
+      readonly: true
+    - name: testSubscriptionName
+      value: 'joaollqtest'
+      readonly: true
+    - name: testKeyVaultName
+      value: 'joaollqtest'
+      readonly: true
+# ACCEPTANCE
     - name: acceptanceBranchName
       value: 'refs/heads/acceptance'
       readonly: true
+    - name: acceptanceAzureRegion
+      value: 'westeurope'
+      readonly: true
+    - name: acceptanceSubscriptionName
+      value: 'joaollqtest'
+      readonly: true
+    - name: acceptanceKeyVaultName
+      value: 'joaollqtest'
+      readonly: true
+# PRODUCTION
     - name: productionBranchName
       value: 'refs/heads/production'
       readonly: true
+    - name: productionAzureRegion
+      value: 'westeurope'
+      readonly: true
+    - name: productionSubscriptionName
+      value: 'joaollqtest'
+      readonly: true
+    - name: productionKeyVaultName
+      value: 'joaollqtest'
+      readonly: true
+#ENV AGNOSTIC
     - name: bimRootFolder
       value: 'TestAAS'
       readonly: true
-    - name: azureRegion
-      value: 'westeurope'
-      readonly: true
-    - name: aasInstanceName
-      value: 'joaollqtest'
-      readonly: true
+    
 
 
 
@@ -131,8 +167,8 @@ stages:
 
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: 'joaollqtest'
-                  KeyVaultName: 'joaollqtest'
+                  azureSubscription: '$(devSubscriptionName)'
+                  KeyVaultName: '$(devKeyVaultName)'
                   SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
@@ -228,7 +264,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
-                  AZURE_REGION : $(azureRegion)
+                  AZURE_REGION : $(devAzureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -274,11 +310,10 @@ stages:
  #              displayName: Step 0.1 - Get Token for AAS admin SP
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: 'joaollqtest'
-                  KeyVaultName: 'joaollqtest'
+                  azureSubscription: '$(testSubscriptionName)'
+                  KeyVaultName: '$(testKeyVaultName)'
                   SecretsFilter: 'cert'
                   RunAsPreJob: false
-
               - powershell: |
                  $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
@@ -369,7 +404,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
-                  AZURE_REGION : $(azureRegion)
+                  AZURE_REGION : $(testAzureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -417,8 +452,8 @@ stages:
 
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: 'joaollqtest'
-                  KeyVaultName: 'joaollqtest'
+                  azureSubscription: '$(acceptanceSubscriptionName)'
+                  KeyVaultName: '$(acceptanceKeyVaultName)'
                   SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
@@ -509,7 +544,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
-                  AZURE_REGION : $(azureRegion)
+                  AZURE_REGION : $(acceptanceAzureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -570,8 +605,8 @@ stages:
  #              displayName: Step 0.1 - Get Token for AAS admin SP
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: 'joaollqtest'
-                  KeyVaultName: 'joaollqtest'
+                  azureSubscription: '$(productionSubscriptionName)'
+                  KeyVaultName: '$(productionKeyVaultName)'
                   SecretsFilter: 'cert'
                   RunAsPreJob: false
               - powershell: |
@@ -664,7 +699,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
-                  AZURE_REGION : $(azureRegion)
+                  AZURE_REGION : $(productionAzureRegion)
 
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
