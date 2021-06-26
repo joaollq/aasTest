@@ -239,6 +239,7 @@ stages:
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
+                      Write-Host $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.Dev.($model.Name)$(access_token)
                       $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.Dev.($model.Name)$(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
