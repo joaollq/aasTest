@@ -351,13 +351,15 @@ stages:
                       
                   # Join the signature to the JWT with "."
                   $JWT = $JWT + "." + $Signature
-                   
+
+                  $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default' 
+
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = '$(clientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                      scope     = $scope
                   }
                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
@@ -367,6 +369,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -488,13 +491,15 @@ stages:
                       
                   # Join the signature to the JWT with "."
                   $JWT = $JWT + "." + $Signature
-                   
+
+                  $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default' 
+
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = '$(clientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                      scope     = $scope
                   }
                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
@@ -504,6 +509,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
                   
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
@@ -641,12 +647,14 @@ stages:
                   # Join the signature to the JWT with "."
                   $JWT = $JWT + "." + $Signature
                    
+                  $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default'
+
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = '$(clientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
+                      scope     = $scope
                   }
                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
                   $token = $LoginResponse.access_token
@@ -656,6 +664,7 @@ stages:
                   CERT_PASS : $(certPassword)
                   CLIENT_ID : $(clientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(azureRegion)
 
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
