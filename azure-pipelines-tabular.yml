@@ -240,7 +240,6 @@ stages:
 
                     foreach ($model in $models) {
                       $connectionString = $connectionStrings.Dev.($model.Name) + "$(access_token)"
-                      Write-Host $connectionString
                       $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
@@ -273,11 +272,17 @@ stages:
  #              env:
  #                CLIENT_SECRET : $(clientSecret)
  #              displayName: Step 0.1 - Get Token for AAS admin SP
+              - task: AzureKeyVault@2
+                inputs:
+                  azureSubscription: 'joaollqtest'
+                  KeyVaultName: 'joaollqtest'
+                  SecretsFilter: 'cert'
+                  RunAsPreJob: false
 
               - powershell: |
-                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
-                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-                  $Certificate.Import($certPath,$env:CERT_PASS,0)
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
+                 $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                 $Certificate.Import($kvSecretBytes)
                   
      
                   # Create base64 hash of certificate
@@ -372,7 +377,8 @@ stages:
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.Test.($model.Name)$(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $connectionString = $connectionStrings.Test.($model.Name) + "$(access_token)"
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 
 # ------- Acceptance -------
@@ -406,12 +412,16 @@ stages:
  #                CLIENT_SECRET : $(clientSecret)
  #              displayName: Step 0.1 - Get Token for AAS admin SP
 
+              - task: AzureKeyVault@2
+                inputs:
+                  azureSubscription: 'joaollqtest'
+                  KeyVaultName: 'joaollqtest'
+                  SecretsFilter: 'cert'
+                  RunAsPreJob: false
               - powershell: |
-                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
-                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-                  $Certificate.Import($certPath,$env:CERT_PASS,0)
-                  
-     
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
+                 $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                 $Certificate.Import($kvSecretBytes)
                   # Create base64 hash of certificate
                   $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
     
@@ -504,7 +514,8 @@ stages:
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.Acceptance.($model.Name)$(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $connectionString = $connectionStrings.Acceptance.($model.Name) + "$(access_token)"
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
 
 # ------- Production -------
@@ -551,11 +562,16 @@ stages:
  #              env:
  #                CLIENT_SECRET : $(clientSecret)
  #              displayName: Step 0.1 - Get Token for AAS admin SP
-
+              - task: AzureKeyVault@2
+                inputs:
+                  azureSubscription: 'joaollqtest'
+                  KeyVaultName: 'joaollqtest'
+                  SecretsFilter: 'cert'
+                  RunAsPreJob: false
               - powershell: |
-                  $certPath = "$(Agent.BuildDirectory)/cert/cert.pfx"
-                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-                  $Certificate.Import($certPath,$env:CERT_PASS,0)
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
+                 $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                 $Certificate.Import($kvSecretBytes)
                   
      
                   # Create base64 hash of certificate
@@ -650,5 +666,6 @@ stages:
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionStrings.Production.($model.Name)$(access_token) "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
+                      $connectionString = $connectionStrings.Production.($model.Name) + "$(access_token)"
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString "$(ASDatabaseName)" -O -C -P -R -M -W -E -V
                     }
