@@ -85,7 +85,7 @@ variables:
       readonly: true
 #ENV AGNOSTIC
     - name: bimRootFolder
-      value: 'TestAAS'
+      value: 'Projects'
       readonly: true
     - name: tenantId
       value: '458f1366-7eb8-42a4-a3b7-8f763033f627'
