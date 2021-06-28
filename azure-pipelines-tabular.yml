@@ -32,6 +32,9 @@ variables:
     - name: devKeyVaultName
       value: 'joaollqtest'
       readonly: true
+    - name: devClientId
+      value: 'b85bd734-4f40-4e55-b538-be22b5a471fe'
+      readonly: true
 # TEST
     - name: testBranchName
       value: 'refs/heads/test'
@@ -44,6 +47,9 @@ variables:
       readonly: true
     - name: testKeyVaultName
       value: 'joaollqtest'
+      readonly: true
+    - name: testClientId
+      value: 'b85bd734-4f40-4e55-b538-be22b5a471fe'
       readonly: true
 # ACCEPTANCE
     - name: acceptanceBranchName
@@ -58,6 +64,9 @@ variables:
     - name: acceptanceKeyVaultName
       value: 'joaollqtest'
       readonly: true
+    - name: acceptanceClientId
+      value: 'b85bd734-4f40-4e55-b538-be22b5a471fe'
+      readonly: true
 # PRODUCTION
     - name: productionBranchName
       value: 'refs/heads/production'
@@ -71,9 +80,15 @@ variables:
     - name: productionKeyVaultName
       value: 'joaollqtest'
       readonly: true
+    - name: productionClientId
+      value: 'b85bd734-4f40-4e55-b538-be22b5a471fe'
+      readonly: true
 #ENV AGNOSTIC
     - name: bimRootFolder
       value: 'TestAAS'
+      readonly: true
+    - name: tenantId
+      value: '458f1366-7eb8-42a4-a3b7-8f763033f627'
       readonly: true
     
 
@@ -153,7 +168,7 @@ stages:
  #             - powershell: |
  #                   $Form = @{
  #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(clientId)'
+ #                       client_id   = '$(devClientId)'
  #                        client_secret = "$env:CLIENT_SECRET"
  #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
  #                   }
@@ -248,7 +263,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(clientId)'
+                      client_id   = '$(devClientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope = $scope
@@ -261,8 +276,7 @@ stages:
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
-                  CERT_PASS : $(certPassword)
-                  CLIENT_ID : $(clientId)
+                  CLIENT_ID : $(devClientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(devAzureRegion)
                   
@@ -297,7 +311,7 @@ stages:
  #             - powershell: |
  #                   $Form = @{
  #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(clientId)'
+ #                       client_id   = '$(testClientId)'
  #                        client_secret = "$env:CLIENT_SECRET"
  #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
  #                   }
@@ -391,7 +405,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(clientId)'
+                      client_id   = '$(testClientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -401,8 +415,7 @@ stages:
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
-                  CERT_PASS : $(certPassword)
-                  CLIENT_ID : $(clientId)
+                  CLIENT_ID : $(testClientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(testAzureRegion)
                   
@@ -438,7 +451,7 @@ stages:
  #             - powershell: |
  #                   $Form = @{
  #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(clientId)'
+ #                       client_id   = '$(acceptanceClientId)'
  #                        client_secret = "$env:CLIENT_SECRET"
  #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
  #                   }
@@ -531,7 +544,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(clientId)'
+                      client_id   = '$(acceptanceClientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -541,8 +554,7 @@ stages:
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
-                  CERT_PASS : $(certPassword)
-                  CLIENT_ID : $(clientId)
+                  CLIENT_ID : $(acceptanceClientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(acceptanceAzureRegion)
                   
@@ -592,7 +604,7 @@ stages:
  #             - powershell: |
  #                   $Form = @{
  #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(clientId)'
+ #                       client_id   = '$(productionClientId)'
  #                        client_secret = "$env:CLIENT_SECRET"
  #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
  #                   }
@@ -686,7 +698,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(clientId)'
+                      client_id   = '$(productionClientId)'
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -696,8 +708,7 @@ stages:
                   Write-Host "##vso[task.setvariable variable=access_token]$token"
                 displayName: Step 0.1 - Get Token for AAS admin SP using certificate
                 env:
-                  CERT_PASS : $(certPassword)
-                  CLIENT_ID : $(clientId)
+                  CLIENT_ID : $(productionClientId)
                   TENANT_ID : $(tenantId)
                   AZURE_REGION : $(productionAzureRegion)
 
