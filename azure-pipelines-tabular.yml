@@ -291,7 +291,7 @@ stages:
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Dev.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Dev.($model.Name).aasDatabaseName
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $(aasDatabaseName) -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
                     }
 # ------- Test -------
 - stage: "Test"
@@ -431,7 +431,7 @@ stages:
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Test.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Test.($model.Name).aasDatabaseName
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $(aasDatabaseName) -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
                     }
 
 # ------- Acceptance -------
@@ -571,7 +571,7 @@ stages:
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Acceptance.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Acceptance.($model.Name).aasDatabaseName
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $(aasDatabaseName) -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
                     }
 
 # ------- Production -------
@@ -726,5 +726,5 @@ stages:
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Production.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Production.($model.Name).aasDatabaseName
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $(aasDatabaseName) -O -C -P -R -M -W -E -V
+                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $model.FullName -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
                     }
