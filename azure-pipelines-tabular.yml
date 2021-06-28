@@ -132,8 +132,6 @@ stages:
             script: |
               $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
 
-              Write-Host "Models " + $models
-
               foreach ($model in $models) {
                 $(tabularFolder)/TabularEditor.exe $model.FullName -A -V
               }
