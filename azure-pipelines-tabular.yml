@@ -130,7 +130,7 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-              $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+              $models = Get-ChildItem -Path $(bimRootFolder) -Include "/*.bim" -Recurse
                             
               foreach ($model in $models) {
                 $(tabularFolder)/TabularEditor.exe $model.FullName -A -V
@@ -285,7 +285,7 @@ stages:
                 inputs:
                   targetType: 'inline'
                   script: |
-                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $models = Get-ChildItem -Path $(bimRootFolder) -Include "/*.bim" -Recurse
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
@@ -424,7 +424,7 @@ stages:
                 inputs:
                   targetType: 'inline'
                   script: |
-                   $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $models = Get-ChildItem -Path $(bimRootFolder) -Include "/*.bim" -Recurse
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
@@ -563,7 +563,7 @@ stages:
                 inputs:
                   targetType: 'inline'
                   script: |
-                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $models = Get-ChildItem -Path $(bimRootFolder) -Include "/*.bim" -Recurse
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
@@ -717,7 +717,7 @@ stages:
                 inputs:
                   targetType: 'inline'
                   script: |
-                    $models = Get-ChildItem -Path ${{ variables.bimRootFolder }}/*.bim
+                    $models = Get-ChildItem -Path $(bimRootFolder) -Include "/*.bim" -Recurse
                     $connectionStrings = Get-Content "connectionStrings.json" | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
