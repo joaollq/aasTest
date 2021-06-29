@@ -90,6 +90,9 @@ variables:
     - name: tenantId
       value: '458f1366-7eb8-42a4-a3b7-8f763033f627'
       readonly: true
+    - name: deploymentDefinitionPath
+      value: 'aasDefinitions.json'
+      readonly: true
     
 
 
@@ -286,7 +289,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Dev.($model.Name).connectionString + "$(access_token)"
@@ -426,7 +429,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Test.($model.Name).connectionString + "$(access_token)"
@@ -566,7 +569,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Acceptance.($model.Name).connectionString + "$(access_token)"
@@ -721,7 +724,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Production.($model.Name).connectionString + "$(access_token)"
