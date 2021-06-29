@@ -90,6 +90,9 @@ variables:
     - name: tenantId
       value: '458f1366-7eb8-42a4-a3b7-8f763033f627'
       readonly: true
+    - name: deploymentDefinitionPath
+      value: 'aasDefinitions.json'
+      readonly: true
     
 
 
@@ -164,30 +167,14 @@ stages:
           deploy:
             steps:
               - checkout: self
- # Uncomment this section if you are using client secrets
- #             - powershell: |
- #                   $Form = @{
- #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(devClientId)'
- #                        client_secret = "$env:CLIENT_SECRET"
- #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
- #                   }
- #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
- #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
- #                   $token = $LoginResponse.access_token
- #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
- #              env:
- #                CLIENT_SECRET : $(clientSecret)
- #              displayName: Step 0.1 - Get Token for AAS admin SP
-
               - task: AzureKeyVault@2
                 inputs:
                   azureSubscription: '$(devSubscriptionName)'
                   KeyVaultName: '$(devKeyVaultName)'
-                  SecretsFilter: 'cert'
+                  SecretsFilter: 'cert'   #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
               - powershell: |
-                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
+                 $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")  
                  $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
                  $Certificate.Import($kvSecretBytes)
                   
@@ -263,7 +250,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(devClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope = $scope
@@ -286,7 +273,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Dev.($model.Name).connectionString + "$(access_token)"
@@ -308,26 +295,11 @@ stages:
           deploy:
             steps:
               - checkout: self
- # Uncomment this section if you are using client secrets
- #             - powershell: |
- #                   $Form = @{
- #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(testClientId)'
- #                        client_secret = "$env:CLIENT_SECRET"
- #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
- #                   }
- #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
- #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
- #                   $token = $LoginResponse.access_token
- #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
- #              env:
- #                CLIENT_SECRET : $(clientSecret)
- #              displayName: Step 0.1 - Get Token for AAS admin SP
               - task: AzureKeyVault@2
                 inputs:
                   azureSubscription: '$(testSubscriptionName)'
                   KeyVaultName: '$(testKeyVaultName)'
-                  SecretsFilter: 'cert'
+                  SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
               - powershell: |
                  $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
@@ -406,7 +378,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(testClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -426,7 +398,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Test.($model.Name).connectionString + "$(access_token)"
@@ -449,27 +421,11 @@ stages:
           deploy:
             steps:
               - checkout: self
- # Uncomment this section if you are using client secrets
- #             - powershell: |
- #                   $Form = @{
- #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(acceptanceClientId)'
- #                        client_secret = "$env:CLIENT_SECRET"
- #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
- #                   }
- #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
- #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
- #                   $token = $LoginResponse.access_token
- #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
- #              env:
- #                CLIENT_SECRET : $(clientSecret)
- #              displayName: Step 0.1 - Get Token for AAS admin SP
-
               - task: AzureKeyVault@2
                 inputs:
                   azureSubscription: '$(acceptanceSubscriptionName)'
                   KeyVaultName: '$(acceptanceKeyVaultName)'
-                  SecretsFilter: 'cert'
+                  SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
               - powershell: |
                  $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
@@ -546,7 +502,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(acceptanceClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -566,7 +522,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Acceptance.($model.Name).connectionString + "$(access_token)"
@@ -603,26 +559,11 @@ stages:
           deploy:
             steps:
               - checkout: self
- # Uncomment this section if you are using client secrets
- #             - powershell: |
- #                   $Form = @{
- #                       grant_type  = 'client_credentials'
- #                       client_id   = '$(productionClientId)'
- #                        client_secret = "$env:CLIENT_SECRET"
- #                       scope     = 'https://{{ variables.azureRegion }}.asazure.windows.net/.default'
- #                   }
- #                   $LoginResponse = ConvertFrom-Json(Invoke-WebRequest -Uri 
- #  'https://login.microsoftonline.com/$(tenantId)/oauth2/v2.0/token' -Method 'POST' -Body $Form)
- #                   $token = $LoginResponse.access_token
- #                  Write-Host "##vso[task.setvariable variable=access_token]$token"
- #              env:
- #                CLIENT_SECRET : $(clientSecret)
- #              displayName: Step 0.1 - Get Token for AAS admin SP
               - task: AzureKeyVault@2
                 inputs:
                   azureSubscription: '$(productionSubscriptionName)'
                   KeyVaultName: '$(productionKeyVaultName)'
-                  SecretsFilter: 'cert'
+                  SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
               - powershell: |
                  $kvSecretBytes = [System.Convert]::FromBase64String("$(cert)")
@@ -701,7 +642,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(productionClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -721,7 +662,7 @@ stages:
                   targetType: 'inline'
                   script: |
                     $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
-                    $aasDefinitions = Get-Content "aasDefinitions.json" | Out-String | ConvertFrom-Json
+                    $aasDefinitions = Get-Content $(deploymentDefinitionPath) | Out-String | ConvertFrom-Json
 
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Production.($model.Name).connectionString + "$(access_token)"
