@@ -266,7 +266,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(devClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope = $scope
@@ -409,7 +409,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(testClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -549,7 +549,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(acceptanceClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
@@ -704,7 +704,7 @@ stages:
 
                   $Form = @{
                       grant_type  = 'client_credentials'
-                      client_id   = '$(productionClientId)'
+                      client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                       scope     = $scope
