@@ -26,7 +26,7 @@ variables:
     - name: devAzureRegion
       value: 'westeurope'
       readonly: true
-    - name: devSubscriptionName
+    - name: devAKVServiceConnection
       value: 'joaollqtest'
       readonly: true
     - name: devKeyVaultName
@@ -42,7 +42,7 @@ variables:
     - name: testAzureRegion
       value: 'westeurope'
       readonly: true
-    - name: testSubscriptionName
+    - name: testAKVServiceConnection
       value: 'joaollqtest'
       readonly: true
     - name: testKeyVaultName
@@ -58,7 +58,7 @@ variables:
     - name: acceptanceAzureRegion
       value: 'westeurope'
       readonly: true
-    - name: acceptanceSubscriptionName
+    - name: acceptanceAKVServiceConnection
       value: 'joaollqtest'
       readonly: true
     - name: acceptanceKeyVaultName
@@ -74,7 +74,7 @@ variables:
     - name: productionAzureRegion
       value: 'westeurope'
       readonly: true
-    - name: productionSubscriptionName
+    - name: productionAKVServiceConnection
       value: 'joaollqtest'
       readonly: true
     - name: productionKeyVaultName
@@ -169,7 +169,7 @@ stages:
               - checkout: self
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: '$(devSubscriptionName)'
+                  azureSubscription: '$(devAKVServiceConnection)'
                   KeyVaultName: '$(devKeyVaultName)'
                   SecretsFilter: 'cert'   #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
@@ -298,7 +298,7 @@ stages:
               - checkout: self
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: '$(testSubscriptionName)'
+                  azureSubscription: '$(testAKVServiceConnection)'
                   KeyVaultName: '$(testKeyVaultName)'
                   SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
@@ -425,7 +425,7 @@ stages:
               - checkout: self
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: '$(acceptanceSubscriptionName)'
+                  azureSubscription: '$(acceptanceAKVServiceConnection)'
                   KeyVaultName: '$(acceptanceKeyVaultName)'
                   SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
@@ -564,7 +564,7 @@ stages:
               - checkout: self
               - task: AzureKeyVault@2
                 inputs:
-                  azureSubscription: '$(productionSubscriptionName)'
+                  azureSubscription: '$(productionAKVServiceConnection)'
                   KeyVaultName: '$(productionKeyVaultName)'
                   SecretsFilter: 'cert' #replace "cert" for the name of the certificate as it is set on the keyvault. Apply the same transformation on the first line of the powershell script
                   RunAsPreJob: false
