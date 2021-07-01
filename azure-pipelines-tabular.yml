@@ -249,16 +249,14 @@ stages:
                   # Join the signature to the JWT with "."
                   $JWT = $JWT + "." + $Signature
                    
-                  $resource = 'https://*.asazure.windows.net'
-
-                  Write-Host $JWT
+                  $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default' 
 
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      resource = $resource
+                      scope     = $scope
                   }
 
                   $url = 'https://login.microsoftonline.com/' + $env:TENANT_ID + '/oauth2/v2.0/token'
