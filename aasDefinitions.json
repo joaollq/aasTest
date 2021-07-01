@@ -1,58 +1,42 @@
 {
-		"dev" : {
-				"Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model"
-				},
-				"Model2.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model2"
-				},
-				"Copy of Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "CopyOfModel"
-				}
-				},
-		"Test" : {
-				"Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model"
-				},
-				"Model2.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model2"
-				},
-				"Copy of Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "CopyOfModel"
-				}
-				},
-		"Acceptance" : {
-				"Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model"
-				},
-				"Model2.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model2"
-				},
-				"Copy of Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "CopyOfModel"
-				}
-				},
-		"Production" : {
-				"Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model"
-				},
-				"Model2.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "Model2"
-				},
-				"Copy of Model.bim" : {
-					"connectionString" : "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-					"aasDatabaseName" : "CopyOfModel"
-				}
-			}
+	"Dev": {
+		"AAS1": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS1_Dev"
+		},
+		"AAS2": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS2_Dev"
+		}
+	},
+	"Test": {
+		"AAS1": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS1_Test"
+		},
+		"AAS2": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS2_Test"
+		}
+	},
+	"Acceptance": {
+		"AAS1": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS1_Acceptance"
+		},
+		"AAS2": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS2_Acceptance"
+		}
+	},
+	"Production": {
+		"AAS1": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS1_Production"
+		},
+		"AAS2": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "AAS2_Production"
+		}
+	}
 }
