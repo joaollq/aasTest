@@ -249,14 +249,14 @@ stages:
                   # Join the signature to the JWT with "."
                   $JWT = $JWT + "." + $Signature
                    
-                   $scope = 'https://' + $env:AZURE_REGION +'.asazure.windows.net/.default'
+                  $resource = 'https://*.asazure.windows.net'
 
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = $env:CLIENT_ID
                       client_assertion = $JWT
                       client_assertion_type = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                      scope = $scope
+                      resource = $resource
                   }
 
                   $url = 'https://login.microsoftonline.com/' + $env:TENANT_ID + '/oauth2/v2.0/token'
@@ -268,8 +268,7 @@ stages:
                 env:
                   CLIENT_ID : $(devClientId)
                   TENANT_ID : $(tenantId)
-                  AZURE_REGION : $(devAzureRegion)
-                  
+                                    
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
                 inputs:
@@ -285,7 +284,7 @@ stages:
                      
                       $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
                       Write-Host Deploying model $bimFilePath with connection string $connectionString
-                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
+                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList "`"$bimFilePath`" -D `"$connectionString`" $aasDatabaseName -O -C -P -R -M -W -E -V"
                     }
 # ------- Test -------
 - stage: "Test"
