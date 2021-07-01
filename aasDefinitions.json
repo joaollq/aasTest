@@ -1,41 +1,41 @@
 {
 	"Dev": {
 		"AAS1": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS1_Dev;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS1_Dev"
 		},
 		"AAS2": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS2_Dev;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS2_Dev"
 		}
 	},
 	"Test": {
 		"AAS1": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS1_Test;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS1_Test"
 		},
 		"AAS2": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS2_Test;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS2_Test"
 		}
 	},
 	"Acceptance": {
 		"AAS1": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS1_Acceptance;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS1_Acceptance"
 		},
 		"AAS2": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS2_Acceptance;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS2_Acceptance"
 		}
 	},
 	"Production": {
 		"AAS1": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS1_Production;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS1_Production"
 		},
 		"AAS2": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=AAS2_Production;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
 			"aasDatabaseName": "AAS2_Production"
 		}
 	}
