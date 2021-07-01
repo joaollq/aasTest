@@ -1,12 +1,8 @@
 {
 	"dev": {
-		"AAS1": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-			"aasDatabaseName": "Model"
-		},
-		"AAS2": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=adventureworks;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
-			"aasDatabaseName": "Model2"
+		"JoaollqModel": {
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=JoaollqModel;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"aasDatabaseName": "JoaollqModel"
 		}
 	},
 	"Test": {
