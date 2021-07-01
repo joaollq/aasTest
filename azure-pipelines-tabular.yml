@@ -279,7 +279,10 @@ stages:
                       $connectionString = $aasDefinitions.Dev.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Dev.($model.Name).aasDatabaseName
                       $bimFilePath = $model.FullName + "/Model.bim"
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $bimFilePath -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
+                     
+                      $tabularEditorPath = $(Agent.BuildDirectory)/drop/TabularEditor.exe
+
+                      Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
 # ------- Test -------
 - stage: "Test"
@@ -405,7 +408,9 @@ stages:
                       $connectionString = $aasDefinitions.Test.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Test.($model.Name).aasDatabaseName
                       $bimFilePath = $model.FullName + "/Model.bim"
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $bimFilePath -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
+                      $tabularEditorPath = $(Agent.BuildDirectory)/drop/TabularEditor.exe
+
+                      Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
 
 # ------- Acceptance -------
