@@ -280,6 +280,7 @@ stages:
                 displayName: Step 1 - Add Firewall Rule
                 inputs:
                   azureSubscription: '$(devAKVServiceConnection)'
+                  azurePowerShellVersion: 'LatestVersion'
                   ScriptType: 'InlineScript'
                   Inline: |
                     $ExistingFirewallRuleName = "AzureDevOps"
@@ -357,6 +358,7 @@ stages:
                         Write-Output "Updated firewall rule to include current IP: $currentIP"
                         Write-Output "Enable Power Bi Service was set to: $powerBi" 
                     }
+                  
 
               - task: PowerShell@2
                 displayName: Step 2- Deploy model to AAS
