@@ -135,7 +135,7 @@ stages:
             script: |
               $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
 
-              $tabularEditorPath = $(tabularFolder)+"/TabularEditor.exe"
+              $tabularEditorPath = "$(tabularFolder)/TabularEditor.exe"
 
               foreach ($model in $models) {
                 Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$model.FullName", "-A", "-V")
