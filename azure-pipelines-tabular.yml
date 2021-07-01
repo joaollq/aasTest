@@ -282,7 +282,7 @@ stages:
                       $aasDatabaseName = $aasDefinitions.Dev.($model.Name).aasDatabaseName
                       $bimFilePath = $model.FullName + "/Model.bim"
                      
-                      $tabularEditorPath = $(Agent.BuildDirectory)+"/drop/TabularEditor.exe"
+                      $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
 
                       Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
