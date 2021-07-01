@@ -251,6 +251,8 @@ stages:
                    
                   $resource = 'https://*.asazure.windows.net'
 
+                  Write-Host $JWT
+
                   $Form = @{
                       grant_type  = 'client_credentials'
                       client_id   = $env:CLIENT_ID
