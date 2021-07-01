@@ -1,5 +1,5 @@
 {
-	"dev": {
+	"Dev": {
 		"JoaollqModel": {
 			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Password=",
 			"aasDatabaseName": "JoaollqModel"
