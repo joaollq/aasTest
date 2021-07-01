@@ -268,6 +268,7 @@ stages:
                 env:
                   CLIENT_ID : $(devClientId)
                   TENANT_ID : $(tenantId)
+                  AZURE_REGION : $(devAzureRegion)
                                     
               - task: PowerShell@2
                 displayName: Step 1 - Deploy model to AAS
