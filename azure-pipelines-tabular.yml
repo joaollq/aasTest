@@ -135,8 +135,10 @@ stages:
             script: |
               $models = Get-ChildItem -Path $(bimRootFolder) -Include "*.bim" -Recurse
 
+              $tabularEditorPath = $(tabularFolder)+"/TabularEditor.exe"
+
               foreach ($model in $models) {
-                $(tabularFolder)/TabularEditor.exe $model.FullName -A -V
+                Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$model.FullName", "-A", "-V")
               }
 
         - task: PublishBuildArtifacts@1
@@ -280,7 +282,7 @@ stages:
                       $aasDatabaseName = $aasDefinitions.Dev.($model.Name).aasDatabaseName
                       $bimFilePath = $model.FullName + "/Model.bim"
                      
-                      $tabularEditorPath = $(Agent.BuildDirectory)/drop/TabularEditor.exe
+                      $tabularEditorPath = $(Agent.BuildDirectory)+"/drop/TabularEditor.exe"
 
                       Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
