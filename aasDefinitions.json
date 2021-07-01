@@ -1,7 +1,7 @@
 {
 	"dev": {
 		"JoaollqModel": {
-			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Initial Catalog=JoaollqModel;Persist Security Info=True;Impersonation Level=Impersonate;Password=",
+			"connectionString": "Provider=MSOLAP;Data Source=asazure://westeurope.asazure.windows.net/joaollqtest;Password=",
 			"aasDatabaseName": "JoaollqModel"
 		}
 	},
