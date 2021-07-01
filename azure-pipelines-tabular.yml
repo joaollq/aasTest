@@ -283,7 +283,7 @@ stages:
                       $bimFilePath = $model.FullName + "/Model.bim"
                      
                       $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
-
+                      Write-Host Deploying model $tabularEditor
                       Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
 # ------- Test -------
