@@ -138,7 +138,7 @@ stages:
               $tabularEditorPath = "$(tabularFolder)/TabularEditor.exe"
 
               foreach ($model in $models) {
-                Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$model.FullName", "-A", "-V")
+                 Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList @("$model.FullName", "-A", "-V")
               }
 
         - task: PublishBuildArtifacts@1
@@ -283,8 +283,8 @@ stages:
                       $bimFilePath = $model.FullName + "/Model.bim"
                      
                       $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
-                      Write-Host Deploying model $tabularEditor
-                      Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V") -PassThru
+                      Write-Host Deploying model $bimFilePath
+                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
                     }
 # ------- Test -------
 - stage: "Test"
