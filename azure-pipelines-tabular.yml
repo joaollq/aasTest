@@ -292,7 +292,6 @@ stages:
                     $powerBi = ($AServiceServer).FirewallConfig.EnablePowerBIService
                     
                     #Getting previous IP from firewall rule, and new public IP
-                    $PreviousRuleIndex = [Array]::IndexOf($FirewallRuleNameList, $ExistingFirewallRuleName)
                     $currentIP = (Invoke-WebRequest -uri $PubIPSource -UseBasicParsing).content.TrimEnd()
                     
                     #Updating rules if request is coming from new IP address.
