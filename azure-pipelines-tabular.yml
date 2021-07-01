@@ -138,7 +138,8 @@ stages:
               $tabularEditorPath = "$(tabularFolder)/TabularEditor.exe"
 
               foreach ($model in $models) {
-                 Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList @("$model.FullName", "-A", "-V")
+                 $modelPath = $model.FullName
+                 Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList @("$modelPath", "-A", "-V")
               }
 
         - task: PublishBuildArtifacts@1
