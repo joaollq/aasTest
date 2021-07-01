@@ -284,7 +284,6 @@ stages:
                       $bimFilePath = $model.FullName + "/Model.bim"
                      
                       $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
-                      Write-Host Deploying model $bimFilePath with connection string $connectionString
                       Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList "`"$bimFilePath`" -D `"$connectionString`" $aasDatabaseName -O -C -P -R -M -W -E -V"
                     }
 # ------- Test -------
@@ -413,9 +412,8 @@ stages:
                       $bimFilePath = $model.FullName + "/Model.bim"
                       $tabularEditorPath = $(Agent.BuildDirectory)/drop/TabularEditor.exe
 
-                      Write-Host $connectionString
-
-                      Start-Process -Wait -filePath $tabularEditorPath -ArgumentList @("$bimFilePath", "-D", "$connectionString", "$aasDatabaseName", "-O", "-C", "-P", "-R", "-M", "-W", "-E", "-V")
+                      $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
+                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList "`"$bimFilePath`" -D `"$connectionString`" $aasDatabaseName -O -C -P -R -M -W -E -V"
                     }
 
 # ------- Acceptance -------
@@ -539,8 +537,10 @@ stages:
                     foreach ($model in $models) {
                       $connectionString = $aasDefinitions.Acceptance.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Acceptance.($model.Name).aasDatabaseName
-                                            $bimFilePath = $model.FullName + "/Model.bim"
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $bimFilePath -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
+                      $bimFilePath = $model.FullName + "/Model.bim"
+
+                      $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
+                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList "`"$bimFilePath`" -D `"$connectionString`" $aasDatabaseName -O -C -P -R -M -W -E -V"
                     }
 
 # ------- Production -------
@@ -681,5 +681,7 @@ stages:
                       $connectionString = $aasDefinitions.Production.($model.Name).connectionString + "$(access_token)"
                       $aasDatabaseName = $aasDefinitions.Production.($model.Name).aasDatabaseName
                       $bimFilePath = $model.FullName + "/Model.bim"
-                      $(Agent.BuildDirectory)/drop/TabularEditor.exe $bimFilePath -D $connectionString $aasDatabaseName -O -C -P -R -M -W -E -V
+                      
+                      $tabularEditorPath = "$(Agent.BuildDirectory)/drop/TabularEditor.exe"
+                      Start-Process -Wait -NoNewWindow  -PassThru -filePath $tabularEditorPath -ArgumentList "`"$bimFilePath`" -D `"$connectionString`" $aasDatabaseName -O -C -P -R -M -W -E -V"
                     }
