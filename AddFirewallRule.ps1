@@ -7,7 +7,7 @@ param(
 $ExistingFirewallRuleName = "AzureDevOps"
 $PubIPSource = "ipinfo.io/ip"
                     
-$AServiceServer = Get-AzAnalysisServicesServer -Name $(ResourceName) -ResourceGroupName $(ResourceGroup)
+$AServiceServer = Get-AzAnalysisServicesServer -Name $ResourceName -ResourceGroupName $ResourceGroup
 $FirewallRules = ($AServiceServer).FirewallConfig.FirewallRules
 $FirewallRuleNameList = $FirewallRules.FirewallRuleName
 $powerBi = ($AServiceServer).FirewallConfig.EnablePowerBIService
